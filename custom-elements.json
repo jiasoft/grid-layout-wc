@@ -1,0 +1,592 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/grid-layout-wc.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "grid-layout-wc",
+          "declaration": {
+            "name": "GridLayoutWc",
+            "module": "/src/GridLayoutWc.js"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/GridLayoutWc.ts",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "",
+          "name": "GridLayoutWc",
+          "members": [
+            {
+              "kind": "field",
+              "name": "RenderIndex",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "griddingWidth",
+              "type": {
+                "text": "number"
+              },
+              "default": "10"
+            },
+            {
+              "kind": "field",
+              "name": "gridMargin",
+              "type": {
+                "text": "number"
+              },
+              "default": "1"
+            },
+            {
+              "kind": "field",
+              "name": "edit",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "layoutData",
+              "type": {
+                "text": "GridItemData[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "dragData",
+              "type": {
+                "text": "object"
+              },
+              "default": "{ x: 0, y: 0, w: 60, h: 60, z: 0, id: DRAG_ID }"
+            },
+            {
+              "kind": "field",
+              "name": "draggIng",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "stageHeight",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "stageWidth",
+              "type": {
+                "text": "number"
+              },
+              "default": "1000"
+            },
+            {
+              "kind": "field",
+              "name": "resizeFixPosition",
+              "type": {
+                "text": "any"
+              },
+              "default": "{ top: 0, left: 0 }"
+            },
+            {
+              "kind": "field",
+              "name": "resizeingPosition",
+              "type": {
+                "text": "any"
+              },
+              "default": "{ top: 0, left: 0 }"
+            },
+            {
+              "kind": "field",
+              "name": "curResizingGridItemData",
+              "type": {
+                "text": "any|null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "zIndex",
+              "type": {
+                "text": "number"
+              },
+              "default": "100"
+            },
+            {
+              "kind": "field",
+              "name": "dataStore",
+              "type": {
+                "text": "any[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "dataStoreIndex",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
+            },
+            {
+              "kind": "field",
+              "name": "curMovingGridItemData",
+              "type": {
+                "text": "any|null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "movePosition",
+              "type": {
+                "text": "HtmlPosition"
+              },
+              "default": "{ left: 0, top: 0 }"
+            },
+            {
+              "kind": "field",
+              "name": "fixPosition",
+              "type": {
+                "text": "HtmlPosition"
+              },
+              "default": "{ left: 0, top: 0 }"
+            },
+            {
+              "kind": "field",
+              "name": "oldPosition",
+              "type": {
+                "text": "HtmlPosition"
+              },
+              "default": "{ left: 0, top: 0 }"
+            },
+            {
+              "kind": "field",
+              "name": "transition",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "method",
+              "name": "drawDragDataHtml"
+            },
+            {
+              "kind": "field",
+              "name": "findGridItemData",
+              "default": "(id: any): GridItemData | undefined => {\n    return this.layoutData.find((item: GridItemData) => item.id === id);\n  }"
+            },
+            {
+              "kind": "method",
+              "name": "addGridItem"
+            },
+            {
+              "kind": "method",
+              "name": "getEmptyBound",
+              "parameters": [
+                {
+                  "name": "w",
+                  "type": {
+                    "text": "number"
+                  }
+                },
+                {
+                  "name": "h",
+                  "type": {
+                    "text": "number"
+                  }
+                }
+              ],
+              "description": "获取空间的位置",
+              "return": {
+                "type": {
+                  "text": "x"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "findBigestOverlapItem",
+              "default": "(x: number, y: number, w: number, h: number, exceptIds?: any[]): GridItemData | undefined => {\n    const list = this.findOverlapItem(x, y, w, h, exceptIds);\n    let BigestOverlapArea = -99999999999; //最大的重叠交叉面积\n    let BigestOverlapItem: any = undefined;\n    list.forEach((item: any) => {\n      let curItemX = item.x;\n      let curItemY = item.y;\n      let curItemW = item.w;\n      let curItemH = item.h;\n      if ( item.id === this.curActiveGridItem?.id && this.dragData ) {\n        curItemX = this.dragData.x;\n        curItemY = this.dragData.y;\n        curItemW = this.dragData.w;\n        curItemH = this.dragData.h;\n      }\n      const overX1 = Math.max(x, curItemX);\n      const overX2 = Math.min(x + w, curItemX + curItemW);\n      const overW = overX2 - overX1;\n      const overY1 = Math.max(y, curItemY);\n      const overY2 = Math.min(y + h, curItemY + curItemH);\n      const overH = overY2 - overY1;\n      const overArea = overH * overW;\n      if (overArea > BigestOverlapArea) {\n        BigestOverlapArea = overArea;\n        BigestOverlapItem = item;\n      }\n    });\n\n    return BigestOverlapItem;\n  }",
+              "description": "查找存在的最大的重叠交叉项"
+            },
+            {
+              "kind": "field",
+              "name": "findOverlapItem",
+              "default": "(x: number, y: number, w: number, h: number, exceptIds?: any[]): GridItemData[] => {\n\n    const list: GridItemData[] = [];\n    const data = this.layoutData.filter((item: any) => !item.float);\n    for (let i = 0; i < data.length; i++) {\n      let item = data[i];\n      if (exceptIds && exceptIds.indexOf(item.id) >= 0) {\n        continue;\n      }\n      let curItemX = item.x;\n      let curItemY = item.y;\n      let curItemW = item.w;\n      let curItemH = item.h;\n      if(item.id === this.curActiveGridItem?.id && this.dragData){\n        curItemX = this.dragData.x;\n        curItemY = this.dragData.y;\n        curItemW = this.dragData.w;\n        curItemH = this.dragData.h;\n      }\n      let x1 = Math.min(curItemX, x);\n      let x2 = Math.max(curItemX + curItemW, x + w);\n\n\n      let y1 = Math.min(curItemY, y);\n      let y2 = Math.max(curItemY + curItemH, y + h);\n\n      //是否存在交叉的算法\n      if (((x2 - x1) - (curItemW + w)) < this.gridMargin &&\n        ((y2 - y1) - (curItemH + h)) < this.gridMargin) {\n        list.push(item);\n      }\n    }\n    return list;\n  }",
+              "description": "获取交叉的GridItem 列表",
+              "parameters": [
+                {
+                  "description": "x",
+                  "name": "x"
+                },
+                {
+                  "description": "y",
+                  "name": "y"
+                },
+                {
+                  "description": "w",
+                  "name": "w"
+                },
+                {
+                  "description": "h",
+                  "name": "h"
+                },
+                {
+                  "description": "排序的id",
+                  "name": "exceptIds"
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "gridItemResizeStart",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "MouseEvent"
+                  },
+                  "description": "MouseEvent"
+                }
+              ],
+              "description": "Resize start"
+            },
+            {
+              "kind": "method",
+              "name": "gridItemResizeing",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "any"
+                  }
+                }
+              ],
+              "description": "resizeing"
+            },
+            {
+              "kind": "method",
+              "name": "gridItemResizeEnd",
+              "description": "Resize end"
+            },
+            {
+              "kind": "method",
+              "name": "getGridItemStyle",
+              "parameters": [
+                {
+                  "name": "data",
+                  "type": {
+                    "text": "GridItemData"
+                  },
+                  "description": "GridItemData"
+                }
+              ],
+              "description": "ItemStyle事件",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "saveCurLayout",
+              "description": "保存Layout"
+            },
+            {
+              "kind": "method",
+              "name": "gridItemClose",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "PointerEvent"
+                  }
+                }
+              ],
+              "description": "移除GridImte"
+            },
+            {
+              "kind": "method",
+              "name": "getGridItemIndex",
+              "parameters": [
+                {
+                  "name": "target",
+                  "type": {
+                    "text": "any"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "getGridItem",
+              "parameters": [
+                {
+                  "name": "target",
+                  "type": {
+                    "text": "any"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "gridItemDragstart",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "PointerEvent"
+                  },
+                  "description": "PointerEvent"
+                }
+              ],
+              "description": "拖拽开始",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "calcNearPosition",
+              "default": "(left: number, top: number): GridPosition => {\n    let x = Math.round(left / this.griddingWidth);\n    let y = Math.round(top / this.griddingWidth);\n    return { x, y };\n  }",
+              "description": "转换成的GidPosition",
+              "parameters": [
+                {
+                  "description": "style.left",
+                  "name": "left"
+                },
+                {
+                  "description": "style.top",
+                  "name": "top"
+                }
+              ],
+              "return": {
+                "type": {
+                  "text": "x"
+                }
+              }
+            },
+            {
+              "kind": "method",
+              "name": "getNearEmptyPosition",
+              "parameters": [
+                {
+                  "name": "grid",
+                  "type": {
+                    "text": "GridItemData"
+                  },
+                  "description": ":GridItemData"
+                }
+              ],
+              "description": "获取最近的空间",
+              "return": {
+                "type": {
+                  "text": "x"
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "isNotNeighbor",
+              "default": "(item: GridItemData): boolean => {\n    const x1 = Math.min(item.x, this.dragData.x);\n    const x2 = Math.max(item.x + item.w, this.dragData.x + this.dragData.w);\n    const leftRight = x2 - x1 >= item.w + this.dragData.w + this.gridMargin;\n\n    let y1 = Math.min(item.y, this.dragData.y);\n    let y2 = Math.max(item.y + item.h, this.dragData.y + this.dragData.h);\n    const upDown = y2 - y1 >= item.h + this.dragData.h + this.gridMargin;\n\n    return leftRight && upDown;\n  }",
+              "description": "非邻国",
+              "parameters": [
+                {
+                  "name": "item"
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "isNeighborLeftRight",
+              "default": "(item: GridItemData): boolean => {\n    const x1 = Math.min(item.x, this.dragData.x);\n    const x2 = Math.max(item.x + item.w, this.dragData.x + this.dragData.w);\n    return x2 - x1 == item.w + this.dragData.w + this.gridMargin;\n  }",
+              "description": "是否左右并列"
+            },
+            {
+              "kind": "field",
+              "name": "isNeighborUpDown",
+              "default": "(item: GridItemData) => {\n    let y1 = Math.min(item.y, this.dragData.y);\n    let y2 = Math.max(item.y + item.h, this.dragData.y + this.dragData.h);\n    return y2 - y1 == item.h + this.dragData.h + this.gridMargin;\n  }",
+              "description": "是否上下并列"
+            },
+            {
+              "kind": "field",
+              "name": "getBackLayout",
+              "default": "() => {\n    this.dataStoreIndex--;\n    return this.dataStore[this.dataStoreIndex]\n  }",
+              "description": "返回 上次的layout",
+              "return": {
+                "type": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "kind": "field",
+              "name": "backLayout",
+              "default": "() => {\n    const data = this.getBackLayout();\n    if (data) {\n      this.layoutData = JSON.parse(data);\n    }\n  }",
+              "description": "打开上次的保存layout"
+            },
+            {
+              "kind": "field",
+              "name": "getForwardLayout",
+              "default": "() => {\n    this.dataStoreIndex = this.dataStore.length - 1 > this.dataStoreIndex ? this.dataStoreIndex + 1 : this.dataStore.length - 1;\n    return this.dataStore[this.dataStoreIndex]\n  }",
+              "description": "下一个layout"
+            },
+            {
+              "kind": "field",
+              "name": "forwardLayout",
+              "default": "() => {\n    const data = this.getForwardLayout();\n    if (data) {\n      this.layoutData = JSON.parse(data);\n    }\n  }",
+              "description": "打开下一步的layout"
+            },
+            {
+              "kind": "field",
+              "name": "close",
+              "default": "() => {\n    const emit: any = new Event('close');\n    emit.detail = this.layoutData;\n    this.dispatchEvent(emit);\n  }"
+            },
+            {
+              "kind": "field",
+              "name": "gridItemFloat",
+              "default": "(event: PointerEvent) => {\n    const gridItem: GridItemData = this.getGridItem(event?.currentTarget);\n    if (gridItem) gridItem.float = !gridItem.float;\n    this.RenderIndex ++;\n  }"
+            },
+            {
+              "kind": "method",
+              "name": "onGridLayoutClick",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": {
+                    "text": "any"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "getMinXY",
+              "parameters": [
+                {
+                  "name": "grid",
+                  "type": {
+                    "text": "ItemData"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "calcOverArea",
+              "parameters": [
+                {
+                  "name": "data1",
+                  "type": {
+                    "text": "ItemData"
+                  }
+                },
+                {
+                  "name": "data2",
+                  "type": {
+                    "text": "ItemData"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "clearBottomOver"
+            },
+            {
+              "kind": "method",
+              "name": "clearTopSpace"
+            },
+            {
+              "kind": "method",
+              "name": "rearrangement"
+            },
+            {
+              "kind": "method",
+              "name": "setZindexUp"
+            },
+            {
+              "kind": "method",
+              "name": "setZindexDown"
+            },
+            {
+              "kind": "field",
+              "name": "curActiveGridItem"
+            },
+            {
+              "kind": "field",
+              "name": "curActiveGridItemStyle"
+            },
+            {
+              "kind": "field",
+              "name": "curSelectGridItem",
+              "type": {
+                "text": "GridItemData|undefined"
+              }
+            }
+          ],
+          "superclass": {
+            "name": "LitElement",
+            "package": "lit"
+          },
+          "tagName": "grid-layout-wc",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "GridLayoutWc",
+          "declaration": {
+            "name": "GridLayoutWc",
+            "module": "src/GridLayoutWc.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/index.ts",
+      "declarations": [],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "GridLayoutWc",
+          "declaration": {
+            "name": "GridLayoutWc",
+            "module": "./GridLayoutWc.js"
+          }
+        }
+      ]
+    }
+  ]
+}
