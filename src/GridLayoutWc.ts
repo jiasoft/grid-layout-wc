@@ -103,7 +103,7 @@ export class GridLayoutWc extends LitElement {
       let curItemY = item.y;
       let curItemW = item.w;
       let curItemH = item.h;
-      if ( item.id === this.curActiveGridItem?.id && this.dragData ) {
+      if (this.curActiveGridItem && this.curActiveGridItem.id === item.id && this.dragData ) {
         curItemX = this.dragData.x;
         curItemY = this.dragData.y;
         curItemW = this.dragData.w;
@@ -146,7 +146,7 @@ export class GridLayoutWc extends LitElement {
       let curItemY = item.y;
       let curItemW = item.w;
       let curItemH = item.h;
-      if(item.id === this.curActiveGridItem?.id && this.dragData){
+      if (this.curActiveGridItem && this.curActiveGridItem.id === item.id && this.dragData) {
         curItemX = this.dragData.x;
         curItemY = this.dragData.y;
         curItemW = this.dragData.w;

@@ -40,12 +40,11 @@ export class GridLayoutWc extends LitElement {
             let BigestOverlapArea = -99999999999; //最大的重叠交叉面积
             let BigestOverlapItem = undefined;
             list.forEach((item) => {
-                var _a;
                 let curItemX = item.x;
                 let curItemY = item.y;
                 let curItemW = item.w;
                 let curItemH = item.h;
-                if (item.id === ((_a = this.curActiveGridItem) === null || _a === void 0 ? void 0 : _a.id) && this.dragData) {
+                if (this.curActiveGridItem && this.curActiveGridItem.id === item.id && this.dragData) {
                     curItemX = this.dragData.x;
                     curItemY = this.dragData.y;
                     curItemW = this.dragData.w;
@@ -75,7 +74,6 @@ export class GridLayoutWc extends LitElement {
          * @returns 交叉的GridItem 列表
          */
         this.findOverlapItem = (x, y, w, h, exceptIds) => {
-            var _a;
             const list = [];
             const data = this.layoutData.filter((item) => !item.float);
             for (let i = 0; i < data.length; i++) {
@@ -87,7 +85,7 @@ export class GridLayoutWc extends LitElement {
                 let curItemY = item.y;
                 let curItemW = item.w;
                 let curItemH = item.h;
-                if (item.id === ((_a = this.curActiveGridItem) === null || _a === void 0 ? void 0 : _a.id) && this.dragData) {
+                if (this.curActiveGridItem && this.curActiveGridItem.id === item.id && this.dragData) {
                     curItemX = this.dragData.x;
                     curItemY = this.dragData.y;
                     curItemW = this.dragData.w;
