@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <style>
+    html,
+    body {
+      padding: 0;
+      margin: 0;
+      background: #fafafa;
+      height: 100%;;
+    }
+    #demo {
+      height: 100%;
+      width:1260px;
+      margin: 0px auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="demo"></div>
+
+  <script type="module">
+    import { html, render } from 'lit';
+    import '../dist/src/grid-layout-wc.js';
+
+    const layoutData = [
+      {
+        id:1,w:30,h:12,x:1,y:1,slot:'slt1'
+      },
+      {
+        id:2,w:30,h:12,x:32,y:1,slot:'slt2'
+      },
+      {
+        id:3,w:30,h:12,x:63,y:1,slot:'slt3'
+      }
+    ];
+    render(
+      html`
+        <grid-layout-wc .layoutData=${layoutData} .edit="${true}">
+          <div slot="slt1" style="margin:25px;padding:10px;background:#9cbdb1;">
+            slt1
+          </div>
+          <div slot="slt2" style="margin:25px;padding:10px;background:#2c8663;">
+            slt2
+          </div>
+          <div slot="slt3" style="margin:25px;padding:10px;background:#cea32c;">
+            slt3
+          </div>
+        </grid-layout-wc>
+      `,
+      document.querySelector('#demo')
+    );
+  </script>
+</body>
+</html>
