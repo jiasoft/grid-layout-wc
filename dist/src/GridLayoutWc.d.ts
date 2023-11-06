@@ -29,12 +29,20 @@ type GridPosition = {
     x: number;
     y: number;
 };
+type StyleType = {
+    borderWidth: number;
+    borderColor: string;
+    borderStyle: string;
+    backgroundColor: string;
+};
 export declare class GridLayoutWc extends LitElement {
     RenderIndex: number;
+    stylemap: StyleType;
     griddingWidth: number;
     gridMargin: number;
     edit: boolean;
     layoutData: GridItemData[];
+    styleMapEditing: boolean;
     dragData: {
         x: number;
         y: number;
@@ -49,7 +57,6 @@ export declare class GridLayoutWc extends LitElement {
     resizeFixPosition: any;
     resizeingPosition: any;
     curResizingGridItemData: any | null;
-    zIndex: number;
     dataStore: any[];
     dataStoreIndex: number;
     curMovingGridItemData: any | null;
@@ -172,9 +179,13 @@ export declare class GridLayoutWc extends LitElement {
     rearrangement(): void;
     setZindexUp(): void;
     setZindexDown(): void;
+    renderStyleSet(): import("lit-html").TemplateResult<1> | "";
+    openSetStyle(): void;
     get curActiveGridItem(): any;
     get curActiveGridItemStyle(): any;
     get curSelectGridItem(): GridItemData | undefined;
+    _connectedCallback(): void;
+    _disconnectedCallback(): void;
     render(): import("lit-html").TemplateResult<1>;
     static styles: import("lit").CSSResult;
 }

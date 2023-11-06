@@ -9,10 +9,12 @@ export class GridLayoutWc extends LitElement {
     constructor() {
         super();
         this.RenderIndex = 0; //这个属性改动，页面才会render
+        this.stylemap = { borderWidth: 1, borderColor: '', borderStyle: '', backgroundColor: '' };
         this.griddingWidth = 10;
         this.gridMargin = 1;
         this.edit = false;
         this.layoutData = [];
+        this.styleMapEditing = false;
         this.dragData = { x: 0, y: 0, w: 60, h: 60, z: 0, id: DRAG_ID };
         this.draggIng = false;
         this.stageHeight = 0;
@@ -20,7 +22,6 @@ export class GridLayoutWc extends LitElement {
         this.resizeFixPosition = { top: 0, left: 0 };
         this.resizeingPosition = { top: 0, left: 0 };
         this.curResizingGridItemData = null;
-        this.zIndex = 100;
         this.dataStore = [];
         this.dataStoreIndex = 0;
         this.curMovingGridItemData = null;
@@ -181,8 +182,15 @@ export class GridLayoutWc extends LitElement {
         //浮动事件
         this.gridItemFloat = (event) => {
             const gridItem = this.getGridItem(event === null || event === void 0 ? void 0 : event.currentTarget);
-            if (gridItem)
+            if (gridItem) {
                 gridItem.float = !gridItem.float;
+                if (gridItem.float) {
+                    gridItem.z = 1;
+                }
+                else {
+                    gridItem.z = 0;
+                }
+            }
             this.RenderIndex++;
         };
     }
@@ -322,17 +330,24 @@ export class GridLayoutWc extends LitElement {
      * @returns
      */
     getGridItemStyle(data) {
+        const ActiveZindex = 10000;
+        const DragZInxex = 9999;
+        const FloatZindex = 100000;
         if (data.style) {
             return `
       transition:none;
       left:${data.style.left}px;
       top:${data.style.top}px;
-      z-index:1000;
+      z-index:${data.float ? FloatZindex + data.z || 0 : ActiveZindex};
       width:${data.style.width}px; 
       height:${data.style.height}px`;
         }
         const style = { left: data.x * this.griddingWidth, top: data.y * this.griddingWidth, width: data.w * this.griddingWidth, height: data.h * this.griddingWidth };
-        const zIndex = data.id === DRAG_ID ? 9999 : (data.float ? (1000 + data.z || 0) : (100 + data.z || 0));
+        let zIndex = data.z || 0;
+        if (data.id === DRAG_ID)
+            zIndex = DragZInxex;
+        if (data.float)
+            zIndex = FloatZindex + data.z || 0;
         return `
       left:${style.left}px;
       top:${style.top}px;
@@ -392,7 +407,7 @@ export class GridLayoutWc extends LitElement {
         this.fixPosition.top = event.clientY;
         this.oldPosition.left = this.movePosition.left;
         this.oldPosition.top = this.movePosition.top;
-        this.curMovingGridItemData.z = 100;
+        // this.curMovingGridItemData.z = 100;
         this.layoutData.forEach((item) => { if (item.id !== this.curMovingGridItemData.id)
             delete item.selected; });
         this.curMovingGridItemData.selected = true;
@@ -403,6 +418,8 @@ export class GridLayoutWc extends LitElement {
         this.transition = true;
         this.RenderIndex++;
         const onDragging = (event) => {
+            if (!this.curMovingGridItemData)
+                return;
             this.curMovingGridItemData.selected = true;
             this.movePosition.left = this.oldPosition.left + (event.clientX - this.fixPosition.left);
             this.movePosition.top = this.oldPosition.top + (event.clientY - this.fixPosition.top);
@@ -434,11 +451,12 @@ export class GridLayoutWc extends LitElement {
             if (!this.edit)
                 return;
             this.draggIng = false;
+            if (!this.curMovingGridItemData)
+                return;
             delete this.curMovingGridItemData.style;
             this.curMovingGridItemData.x = this.dragData.x;
             this.curMovingGridItemData.y = this.dragData.y;
             this.curMovingGridItemData.time = new Date().getTime();
-            this.curMovingGridItemData.z = 0;
             this.curMovingGridItemData = null;
             this.transition = false;
             this.RenderIndex++;
@@ -466,10 +484,12 @@ export class GridLayoutWc extends LitElement {
     }
     //GridLayout的点击事件
     onGridLayoutClick(event) {
-        var _a, _b;
+        var _a, _b, _c;
         if ((_a = event === null || event === void 0 ? void 0 : event.target) === null || _a === void 0 ? void 0 : _a.closest(".toolbar"))
             return;
         if ((_b = event === null || event === void 0 ? void 0 : event.target) === null || _b === void 0 ? void 0 : _b.closest(".grid-item"))
+            return;
+        if ((_c = event === null || event === void 0 ? void 0 : event.target) === null || _c === void 0 ? void 0 : _c.closest("[slot]"))
             return;
         this.layoutData.forEach((item) => { delete item.selected; });
         this.RenderIndex++;
@@ -570,6 +590,39 @@ export class GridLayoutWc extends LitElement {
             this.RenderIndex++;
         }
     }
+    renderStyleSet() {
+        return this.styleMapEditing ? html `
+    <div class="style-set">
+      <label class="item">
+        <span class="lab">border-width:</span>
+        <div class="ctr">
+          <input class="ctr-input" type="number" min="0" max="10" .value="${this.stylemap.borderWidth}" @change="${(e) => { this.stylemap.borderWidth = parseFloat(e.currentTarget.value); this.RenderIndex++; }}" />
+        </div>
+      </label>
+      <label class="item">
+        <span class="lab">border-style:</span>
+        <div class="ctr">
+          <input  class="ctr-input" min="0" max="10" .value="${this.stylemap.borderStyle}" @change="${(e) => { this.stylemap.borderStyle = e.currentTarget.value; this.RenderIndex++; }}" />
+        </div>
+      </label>
+      <label class="item">
+        <span class="lab">border-color:</span>
+        <div class="ctr">
+          <input class="ctr-input"  min="0" max="10" .value="${this.stylemap.borderColor}" @change="${(e) => { this.stylemap.borderColor = e.currentTarget.value; this.RenderIndex++; }}" />
+        </div>
+      </label>
+      <label class="item">
+        <span class="lab">background-color:</span>
+        <div class="ctr">
+          <input class="ctr-input" min="0" max="10" .value="${this.stylemap.backgroundColor}" @change="${(e) => { this.stylemap.backgroundColor = e.currentTarget.value; this.RenderIndex++; }}" />
+        </div>
+      </label>
+    </div>` : '';
+    }
+    openSetStyle() {
+        this.styleMapEditing = !this.styleMapEditing;
+        this.RenderIndex++;
+    }
     //当前活动的GridItem
     get curActiveGridItem() {
         return this.curMovingGridItemData || this.curResizingGridItemData || null;
@@ -582,30 +635,16 @@ export class GridLayoutWc extends LitElement {
     get curSelectGridItem() {
         return this.layoutData.find(item => item.selected);
     }
-    // connectedCallback(){
-    //   // 
-    // }
-    // disconnectedCallback(){
-    // }
+    _connectedCallback() { }
+    _disconnectedCallback() {
+    }
     render() {
-        var _a;
+        var _a, _b;
         this.stageWidth = this.getBoundingClientRect().width;
         return html `<div class="grid-layout" @click="${this.onGridLayoutClick}">
     <div class="grid-sitting" style="'height:${this.stageHeight}px'"></div>
     ${this.edit ? html `
       <div class="toolbar">
-        <div style="margin-right:20px;display:${((_a = this.curSelectGridItem) === null || _a === void 0 ? void 0 : _a.float) ? 'flex' : 'none'}">
-          <i class="el-icon add" @click="${this.setZindexUp}" >
-            <!--[-->
-              <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ea893728=""><path fill="currentColor" d="M572.235 205.282v600.365a30.118 30.118 0 1 1-60.235 0V205.282L292.382 438.633a28.913 28.913 0 0 1-42.646 0 33.43 33.43 0 0 1 0-45.236l271.058-288.045a28.913 28.913 0 0 1 42.647 0L834.5 393.397a33.43 33.43 0 0 1 0 45.176 28.913 28.913 0 0 1-42.647 0l-219.618-233.23z"></path></svg>
-            <!--]-->
-          </i>
-          <i class="el-icon back" @click="${this.setZindexDown}">
-            <!--[-->
-              <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ea893728=""><path fill="currentColor" d="M544 805.888V168a32 32 0 1 0-64 0v637.888L246.656 557.952a30.72 30.72 0 0 0-45.312 0 35.52 35.52 0 0 0 0 48.064l288 306.048a30.72 30.72 0 0 0 45.312 0l288-306.048a35.52 35.52 0 0 0 0-48 30.72 30.72 0 0 0-45.312 0L544 805.824z"></path></svg>
-            <!--]-->
-          </i>
-        </div>
         <i class="el-icon add" @click="${this.addGridItem}" >
           <!--[-->
           <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ea893728=""><path fill="currentColor" d="M480 480V128a32 32 0 0 1 64 0v352h352a32 32 0 1 1 0 64H544v352a32 32 0 1 1-64 0V544H128a32 32 0 0 1 0-64h352z"></path></svg>
@@ -633,12 +672,36 @@ export class GridLayoutWc extends LitElement {
           </svg>
           <!--]-->
         </i>
-        <i class="el-icon close" @click="close()">
+        <i class="el-icon close">
           <!--[-->
           <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ea893728=""><path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path></svg>
           <!--]-->
         </i>
-      </div>` : ''}
+      </div>
+      
+      <div style="display:${this.curSelectGridItem ? 'flex' : 'none'}" class="toolbar vertical">
+      <i class="el-icon z-index-up" @click="${this.setZindexUp}" style="display:${((_a = this.curSelectGridItem) === null || _a === void 0 ? void 0 : _a.float) ? 'flex' : 'none'}">
+        <!--[-->
+          <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ea893728=""><path fill="currentColor" d="M572.235 205.282v600.365a30.118 30.118 0 1 1-60.235 0V205.282L292.382 438.633a28.913 28.913 0 0 1-42.646 0 33.43 33.43 0 0 1 0-45.236l271.058-288.045a28.913 28.913 0 0 1 42.647 0L834.5 393.397a33.43 33.43 0 0 1 0 45.176 28.913 28.913 0 0 1-42.647 0l-219.618-233.23z"></path></svg>
+        <!--]-->
+      </i>
+      <i class="el-icon z-index-down" @click="${this.setZindexDown}" style="display:${((_b = this.curSelectGridItem) === null || _b === void 0 ? void 0 : _b.float) ? 'flex' : 'none'}">
+        <!--[-->
+          <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ea893728=""><path fill="currentColor" d="M544 805.888V168a32 32 0 1 0-64 0v637.888L246.656 557.952a30.72 30.72 0 0 0-45.312 0 35.52 35.52 0 0 0 0 48.064l288 306.048a30.72 30.72 0 0 0 45.312 0l288-306.048a35.52 35.52 0 0 0 0-48 30.72 30.72 0 0 0-45.312 0L544 805.824z"></path></svg>
+        <!--]-->
+      </i>
+      <div class="style-box">
+        ${this.renderStyleSet()}
+        <i class="el-icon style-update-btn"  @click="${this.openSetStyle}" active="${this.styleMapEditing}">
+          <!--[-->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-border-style" viewBox="0 0 16 16">
+              <path d="M1 3.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-1zm0 4a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-1zm0 4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm8 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-4 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm8 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-4-4a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-1z"/>
+            </svg>
+          <!--]-->
+        </i>
+      </div>
+    </div>
+    ` : ''}
     
     ${this.layoutData.map((item, i) => {
             return html `
@@ -651,7 +714,7 @@ export class GridLayoutWc extends LitElement {
         >
         <slot name="${item.slot || ''}"></slot>
         <div class="tool-box">
-          <i class="el-icon set-float" @click="{this.gridItemFloat}">
+          <i class="el-icon set-float">
             <!--[-->
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-subtract" viewBox="0 0 16 16">
               <path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
@@ -672,6 +735,7 @@ export class GridLayoutWc extends LitElement {
     ${this.draggIng ? this.drawDragDataHtml() : ''}
 
   </div>
+  ${this.styleMapEditing}
     `;
     }
 }
@@ -687,21 +751,29 @@ GridLayoutWc.styles = css `
     height: 100%;
     overflow-x: hidden;
   }
-  .toolbar{
+  .toolbar {
     position: absolute;
     right:5px;
     top:5px;
-    padding:2px;
-    z-index: 9999;
+    padding:2px 3px;
+    z-index: 999999;
     display:flex;
+    background: #000;
+    box-shadow: 2px 2px 5px #000;
+    border-radius:3px;
   }
-  .toolbar .el-icon svg{
+  .toolbar.vertical {
+    top:20%;
+    right:5px;
+    flex-flow: column;
+  }
+  .toolbar .el-icon svg {
     width:18px;
     height: 18px;
   }
   .toolbar .el-icon {
     cursor: pointer;
-    margin:0px 3px;
+    margin:3px 3px;
     border:1px solid #dbdbdb;
     border-radius: 3px;
     padding: 3px;
@@ -712,14 +784,24 @@ GridLayoutWc.styles = css `
   .toolbar .el-icon:hover {
     background-color: #4097e4;
     color:#fff;
+    opacity:0.7;
   }
-  .toolbar .el-icon.forward svg{
+
+  .toolbar .el-icon[active="true"] {
+    background-color: #4097e4;
+    color:#fff;
+  }
+  .toolbar .el-icon:active{
+    background-color: rgb(131 177 217);
+    color:#fff;
+  }
+  .toolbar .el-icon.forward svg {
     transform: scaleX(-1);
   }
   .old-data {
     opacity: 0.3;
   }
-  .grid-sitting{
+  .grid-sitting {
     width:100%;
     top:0px;
     position: absolute;
@@ -743,20 +825,22 @@ GridLayoutWc.styles = css `
     cursor:move;
   }
   .grid-item[selected="true"] {
-    box-shadow: 0px 0px 6px -2px rgb(48 47 51);
+    border-color:#79889d;
     transition: none;
+    border-width: 1px;
+    border-style: dashed;
   }
-  .grid-item[float="true"]{
-    border:1px solid #3250a7;
+  .grid-item[float="true"] {
+    box-shadow:rgb(0, 0, 0) 5px 5px 24px -10px;
   }
-  .grid-item[float="true"] .tool-box .set-float{
+  .grid-item[float="true"] .tool-box .set-float {
     opacity: 1;
     color:#3250a7;
   }
-  .grid-item:hover .resize{
+  .grid-item:hover .resize {
     display: flex;
   }
-  .grid-item .bottom-right{
+  .grid-item .bottom-right {
    cursor: se-resize;
    right: 4px;
    bottom: 4px;
@@ -779,14 +863,14 @@ GridLayoutWc.styles = css `
    border-radius: 3px;
    display: flex;
  }
- .grid-item .tool-box .el-icon:hover{
+ .grid-item .tool-box .el-icon:hover {
    cursor:pointer;
    opacity: 0.6;
   }
   .grid-item .resize > svg {
     color: rgb(160 160 160)
   }
-  .grid-item .resize:hover{
+  .grid-item .resize:hover {
     opacity: 0.6;
   }
 
@@ -798,16 +882,53 @@ GridLayoutWc.styles = css `
    transition: none;
  }
  .grid-item[drag=true] .close,
- .grid-item[drag=true] .set-float{
+ .grid-item[drag=true] .set-float {
    display: none;
  }
- .resize{
+ .resize {
    position: absolute;
+ }
+ .style-box {
+  position:relative;
+ }
+ .style-set {
+  padding:10px;
+  position:absolute;
+  min-width:200px;
+  min-height:100px;
+  background:#000;
+  z-index:0;
+  top:0px;
+  right:40px;
+  border-radius:3px;
+  box-shadow:0px 0px 10px #000;
+  opacity:0.6;
+  color:#fff;
+ }
+ .style-set .item {
+  display:flex;
+  margin:5px 0px;
+ }
+ .style-set .item > span {
+  display: block;
+  min-width: 125px;
+  margin-right: 13px;
+  color: #e2e2e2;
+  font-size: 14px;
+ }
+ .style-set .ctr-input {
+  height: 20px;
+  width: 72px;
+  border: 1px solid rgb(0, 0, 0);
+  border-radius: 3px;
  }
 `;
 __decorate([
     state()
 ], GridLayoutWc.prototype, "RenderIndex", void 0);
+__decorate([
+    state()
+], GridLayoutWc.prototype, "stylemap", void 0);
 __decorate([
     property({ type: Number })
 ], GridLayoutWc.prototype, "griddingWidth", void 0);

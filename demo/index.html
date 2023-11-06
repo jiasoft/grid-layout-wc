@@ -33,20 +33,15 @@
       },
       {
         id:3,w:30,h:12,x:63,y:1,slot:'slt3'
+      },
+      {
+        id:4,w:30,h:12,x:94,y:1,slot:'slt4'
       }
     ];
     render(
       html`
         <grid-layout-wc .layoutData=${layoutData} .edit="${true}">
-          <div slot="slt1" style="margin:25px;padding:10px;background:#9cbdb1;">
-            slt1
-          </div>
-          <div slot="slt2" style="margin:25px;padding:10px;background:#2c8663;">
-            slt2
-          </div>
-          <div slot="slt3" style="margin:25px;padding:10px;background:#cea32c;">
-            slt3
-          </div>
+         
         </grid-layout-wc>
       `,
       document.querySelector('#demo')
