@@ -733,9 +733,7 @@ export class GridLayoutWc extends LitElement {
       `;
         })}
     ${this.draggIng ? this.drawDragDataHtml() : ''}
-
   </div>
-  ${this.styleMapEditing}
     `;
     }
 }
