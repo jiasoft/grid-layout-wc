@@ -338,6 +338,7 @@ export class GridLayoutWc extends LitElement {
     if (!this.edit) return;
     const target: any = event?.target;
     if (target?.closest('.grid-item-close')) {
+      this.styleMapEditing = false;
       this.gridItemClose(event);
       return;
     }
@@ -347,7 +348,12 @@ export class GridLayoutWc extends LitElement {
     }
 
     event.preventDefault();
-    this.curMovingGridItemData = this.getGridItem(event.currentTarget);
+    const grid = this.getGridItem(event.currentTarget);
+    if(this.curSelectGridItem && this.curSelectGridItem.id !== grid.id){
+      this.styleMapEditing = false;
+    }
+    this.curMovingGridItemData = grid;
+    // this.curMovingGridItemData = this.getGridItem(event.currentTarget);
     if (!this.curMovingGridItemData) return;
     const { w, h, x, y, id } = this.curMovingGridItemData;
     this.movePosition = {
@@ -533,6 +539,7 @@ export class GridLayoutWc extends LitElement {
     if (event?.target?.closest(".grid-item")) return;
     if (event?.target?.closest("[slot]")) return;
     this.layoutData.forEach((item) => { delete item.selected });
+    this.styleMapEditing = false;
     this.RenderIndex++;
   }
   //获取最小的Y座标
