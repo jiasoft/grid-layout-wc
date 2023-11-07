@@ -309,8 +309,13 @@ export class GridLayoutWc extends LitElement {
   }
   /** 保存Layout */
   saveCurLayout() {
-    this.dataStoreIndex++;
-    this.dataStore[this.dataStoreIndex] = JSON.stringify(this.layoutData);
+    let json = JSON.stringify(this.layoutData);
+    if(json != this.dataStore[this.dataStoreIndex]){
+      this.dataStoreIndex++;
+      this.dataStore[this.dataStoreIndex] = json;
+    }
+    
+    
   }
   /** 移除GridImte */
   gridItemClose(event: PointerEvent) {
@@ -461,11 +466,9 @@ export class GridLayoutWc extends LitElement {
     const x1 = Math.min(item.x, this.dragData.x);
     const x2 = Math.max(item.x + item.w, this.dragData.x + this.dragData.w);
     const leftRight = x2 - x1 >= item.w + this.dragData.w + this.gridMargin;
-
     let y1 = Math.min(item.y, this.dragData.y);
     let y2 = Math.max(item.y + item.h, this.dragData.y + this.dragData.h);
     const upDown = y2 - y1 >= item.h + this.dragData.h + this.gridMargin;
-
     return leftRight && upDown;
   }
   /** 
@@ -822,6 +825,7 @@ export class GridLayoutWc extends LitElement {
     display: inline-flex;
     width: 18px;height: 18px;
     background-color: #fff;
+    color:#333;
   }
   .toolbar .el-icon:hover {
     background-color: #4097e4;

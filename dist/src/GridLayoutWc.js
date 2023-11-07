@@ -357,8 +357,11 @@ export class GridLayoutWc extends LitElement {
     }
     /** 保存Layout */
     saveCurLayout() {
-        this.dataStoreIndex++;
-        this.dataStore[this.dataStoreIndex] = JSON.stringify(this.layoutData);
+        let json = JSON.stringify(this.layoutData);
+        if (json != this.dataStore[this.dataStoreIndex]) {
+            this.dataStoreIndex++;
+            this.dataStore[this.dataStoreIndex] = json;
+        }
     }
     /** 移除GridImte */
     gridItemClose(event) {
@@ -785,6 +788,7 @@ GridLayoutWc.styles = css `
     display: inline-flex;
     width: 18px;height: 18px;
     background-color: #fff;
+    color:#333;
   }
   .toolbar .el-icon:hover {
     background-color: #4097e4;

@@ -33,3 +33,7 @@ npm start
 ```
 
 To run a local development server that serves the basic demo located in `demo/index.html`
+##发布
+```bash
+npm publish
+```
