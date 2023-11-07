@@ -309,13 +309,16 @@ export class GridLayoutWc extends LitElement {
   }
   /** 保存Layout */
   saveCurLayout() {
-    let json = JSON.stringify(this.layoutData);
-    if(json != this.dataStore[this.dataStoreIndex]){
-      this.dataStoreIndex++;
-      this.dataStore[this.dataStoreIndex] = json;
+    let jsonstr = JSON.stringify(this.layoutData);
+    let json = JSON.stringify(JSON.parse(jsonstr).map((item:any) => {
+      delete item.time;
+      delete item.selected;
+      return item;
+    }));
+    if (json != this.dataStore[this.dataStoreIndex]) {
+        this.dataStoreIndex++;
+        this.dataStore[this.dataStoreIndex] = json;
     }
-    
-    
   }
   /** 移除GridImte */
   gridItemClose(event: PointerEvent) {
