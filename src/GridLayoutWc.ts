@@ -964,5 +964,13 @@ export class GridLayoutWc extends LitElement {
   border: 1px solid rgb(0, 0, 0);
   border-radius: 3px;
  }
+ .toolbar .el-icon.style-update-btn:hover{
+  background-color:#fff;
+  color:#333;
+ }
+ .toolbar .el-icon.style-update-btn[active="true"]{
+    background-color: #4097e4;
+    color:#fff;
+ }
 `;
 }
