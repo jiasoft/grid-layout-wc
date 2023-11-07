@@ -425,7 +425,7 @@
             {
               "kind": "field",
               "name": "isNotNeighbor",
-              "default": "(item: GridItemData): boolean => {\n    const x1 = Math.min(item.x, this.dragData.x);\n    const x2 = Math.max(item.x + item.w, this.dragData.x + this.dragData.w);\n    const leftRight = x2 - x1 >= item.w + this.dragData.w + this.gridMargin;\n\n    let y1 = Math.min(item.y, this.dragData.y);\n    let y2 = Math.max(item.y + item.h, this.dragData.y + this.dragData.h);\n    const upDown = y2 - y1 >= item.h + this.dragData.h + this.gridMargin;\n\n    return leftRight && upDown;\n  }",
+              "default": "(item: GridItemData): boolean => {\n    const x1 = Math.min(item.x, this.dragData.x);\n    const x2 = Math.max(item.x + item.w, this.dragData.x + this.dragData.w);\n    const leftRight = x2 - x1 >= item.w + this.dragData.w + this.gridMargin;\n    let y1 = Math.min(item.y, this.dragData.y);\n    let y2 = Math.max(item.y + item.h, this.dragData.y + this.dragData.h);\n    const upDown = y2 - y1 >= item.h + this.dragData.h + this.gridMargin;\n    return leftRight && upDown;\n  }",
               "description": "非邻国",
               "parameters": [
                 {
