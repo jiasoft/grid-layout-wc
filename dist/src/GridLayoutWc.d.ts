@@ -91,7 +91,7 @@ export declare class GridLayoutWc extends LitElement {
      * @param exceptIds 排序的id
      * @returns 交叉的GridItem 列表
      */
-    findOverlapItem: (dataList: GridItemData[], x: number, y: number, w: number, h: number, exceptIds?: any[]) => GridItemData[];
+    findOverlapItem: (dataList: GridItemData[], x: number, y: number, w: number, h: number, exceptIds?: any[], overCount?: number) => GridItemData[];
     /**
      * Resize start
      * @param event MouseEvent
@@ -168,8 +168,8 @@ export declare class GridLayoutWc extends LitElement {
     setZindexUp(): void;
     setZindexDown(): void;
     renderStyleSet(): import("lit-html").TemplateResult<1> | "";
+    renderToobar(): import("lit-html").TemplateResult<1> | "";
     openSetStyle(): void;
-    scroll(e: any): void;
     get curActiveGridItem(): any;
     get curActiveGridItemStyle(): any;
     get curSelectGridItem(): GridItemData | undefined;

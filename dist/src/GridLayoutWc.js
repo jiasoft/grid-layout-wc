@@ -75,7 +75,7 @@ export class GridLayoutWc extends LitElement {
          * @param exceptIds 排序的id
          * @returns 交叉的GridItem 列表
          */
-        this.findOverlapItem = (dataList, x, y, w, h, exceptIds) => {
+        this.findOverlapItem = (dataList, x, y, w, h, exceptIds, overCount = 0) => {
             const list = [];
             let data = dataList.filter((item) => !item.float);
             if (this.curActiveGridItem && this.dragData) {
@@ -103,8 +103,8 @@ export class GridLayoutWc extends LitElement {
                 let y1 = Math.min(curItemY, y);
                 let y2 = Math.max(curItemY + curItemH, y + h);
                 //是否存在交叉的算法
-                if (((x2 - x1) - (curItemW + w)) < this.gridMargin &&
-                    ((y2 - y1) - (curItemH + h)) < this.gridMargin) {
+                if (((x2 - x1) - (curItemW + w) + overCount) < this.gridMargin &&
+                    ((y2 - y1) - (curItemH + h) + overCount) < this.gridMargin) {
                     list.push(item);
                 }
             }
@@ -161,8 +161,10 @@ export class GridLayoutWc extends LitElement {
             const gridItem = this.getGridItem(event === null || event === void 0 ? void 0 : event.currentTarget);
             if (gridItem) {
                 gridItem.float = !gridItem.float;
+                let z = 0;
+                this.layoutData.filter(item => item.float).forEach(item => { z = z < item.z ? item.z : z; });
                 if (gridItem.float) {
-                    gridItem.z = 1;
+                    gridItem.z = z + 1;
                 }
                 else {
                     gridItem.z = 0;
@@ -583,18 +585,45 @@ export class GridLayoutWc extends LitElement {
     //向上
     setZindexUp() {
         var _a;
-        if ((_a = this.curSelectGridItem) === null || _a === void 0 ? void 0 : _a.float) {
-            this.curSelectGridItem.z++;
-            this.RenderIndex++;
+        if (!((_a = this.curSelectGridItem) === null || _a === void 0 ? void 0 : _a.float)) {
+            return;
         }
+        let floatGridItems = this.layoutData.filter(item => item.float);
+        floatGridItems = floatGridItems.sort((a, b) => a.z - b.z);
+        floatGridItems.forEach((item, i) => {
+            item.z = i;
+        });
+        let index = floatGridItems.findIndex((item) => { var _a; return item.id === ((_a = this.curSelectGridItem) === null || _a === void 0 ? void 0 : _a.id); });
+        if (index >= floatGridItems.length - 1)
+            return;
+        const item = floatGridItems.splice(index, 1);
+        floatGridItems.splice(index + 1, 0, item[0]);
+        floatGridItems.forEach((item, i) => {
+            item.z = i;
+        });
+        this.RenderIndex++;
     }
     //向下
     setZindexDown() {
         var _a;
-        if ((_a = this.curSelectGridItem) === null || _a === void 0 ? void 0 : _a.float) {
-            this.curSelectGridItem.z--;
-            this.RenderIndex++;
+        if (!((_a = this.curSelectGridItem) === null || _a === void 0 ? void 0 : _a.float)) {
+            return;
         }
+        let floatGridItems = this.layoutData.filter(item => item.float);
+        floatGridItems = floatGridItems.sort((a, b) => a.z - b.z);
+        floatGridItems.forEach((item, i) => {
+            item.z = i;
+        });
+        let index = floatGridItems.findIndex((item) => { var _a; return item.id === ((_a = this.curSelectGridItem) === null || _a === void 0 ? void 0 : _a.id); });
+        if (index === 0)
+            return;
+        const item = floatGridItems.splice(index, 1);
+        floatGridItems.splice(index - 1, 0, item[0]);
+        floatGridItems.forEach((item, i) => {
+            item.z = i;
+        });
+        this.RenderIndex++;
+        ;
     }
     renderStyleSet() {
         return this.styleMapEditing ? html `
@@ -625,12 +654,28 @@ export class GridLayoutWc extends LitElement {
       </label>
     </div>` : '';
     }
+    renderToobar() {
+        if (!this.edit)
+            return '';
+        return html `<div class="tool-box">
+    <i class="el-icon set-float">
+      <!--[-->
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-subtract" viewBox="0 0 16 16">
+        <path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
+      </svg>
+      <!--]-->
+    </i>
+    <i class="el-icon close grid-item-close" style="font-size:20px;" >
+      <!--[-->
+      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path></svg>
+      <!--]-->
+    </i>
+  </div>
+  <div class="resize bottom-right" @mousedown="${this.gridItemResizeStart}" ></div>`;
+    }
     openSetStyle() {
         this.styleMapEditing = !this.styleMapEditing;
         this.RenderIndex++;
-    }
-    scroll(e) {
-        console.log(e);
     }
     //当前活动的GridItem
     get curActiveGridItem() {
@@ -659,7 +704,7 @@ export class GridLayoutWc extends LitElement {
     render() {
         var _a, _b, _c;
         this.stageWidth = this.getBoundingClientRect().width;
-        return html `<div class="grid-layout" @click="${this.onGridLayoutClick}" @onscroll="${this.onscroll}">
+        return html `<div class="grid-layout" @click="${this.onGridLayoutClick}">
     <div class="grid-sitting" style="height:${this.stageHeight}px"></div>
     ${this.edit ? html `
       <div class="toolbar" >
@@ -727,28 +772,14 @@ export class GridLayoutWc extends LitElement {
       <div class="grid-item"  data-index="${i}" .griddingWidth="${this.griddingWidth}"
         selected="${item.selected}"
         float="${item.float}"
+        edit="${this.edit}"
         @mousedown="${this.gridItemDragstart}"
         style="${this.getGridItemStyle(item)}"
         transition="${this.transition}"
         >
         <slot name="${item.slot || ''}"></slot>
-        <div class="tool-box">
-          <i class="el-icon set-float">
-            <!--[-->
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-subtract" viewBox="0 0 16 16">
-              <path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
-            </svg>
-            <!--]-->
-          </i>
-          <i @click="{this.gridItemClose}" class="el-icon close grid-item-close" style="font-size:20px;" >
-            <!--[-->
-            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path></svg>
-            <!--]-->
-          </i>
-        </div>
-        <div class="resize bottom-right" @mousedown="${this.gridItemResizeStart}" ></div>
+        ${this.renderToobar()}
       </div>
-      
       `;
         })}
     ${this.draggIng ? this.drawDragDataHtml() : ''}
