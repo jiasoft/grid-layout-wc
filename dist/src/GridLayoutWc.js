@@ -14,10 +14,11 @@ export class GridLayoutWc extends LitElement {
         this.gridMargin = 1;
         this.edit = false;
         this.layoutData = [];
+        this.oldLayoutData = "";
         this.styleMapEditing = false;
         this.dragData = { x: 0, y: 0, w: 60, h: 60, z: 0, id: DRAG_ID };
         this.draggIng = false;
-        this.stageHeight = 0;
+        // stageHeight: number = 0;
         this.stageWidth = 1000;
         this.resizeFixPosition = { top: 0, left: 0 };
         this.resizeingPosition = { top: 0, left: 0 };
@@ -36,8 +37,8 @@ export class GridLayoutWc extends LitElement {
         /**
          * 查找存在的最大的重叠交叉项
          * */
-        this.findBigestOverlapItem = (x, y, w, h, exceptIds) => {
-            const list = this.findOverlapItem(x, y, w, h, exceptIds);
+        this.findBigestOverlapItem = (dataList, x, y, w, h, exceptIds) => {
+            const list = this.findOverlapItem(dataList, x, y, w, h, exceptIds);
             let BigestOverlapArea = -99999999999; //最大的重叠交叉面积
             let BigestOverlapItem = undefined;
             list.forEach((item) => {
@@ -45,12 +46,12 @@ export class GridLayoutWc extends LitElement {
                 let curItemY = item.y;
                 let curItemW = item.w;
                 let curItemH = item.h;
-                if (this.curActiveGridItem && this.curActiveGridItem.id === item.id && this.dragData) {
-                    curItemX = this.dragData.x;
-                    curItemY = this.dragData.y;
-                    curItemW = this.dragData.w;
-                    curItemH = this.dragData.h;
-                }
+                // if (this.curActiveGridItem && this.curActiveGridItem.id === item.id && this.dragData) {
+                //   curItemX = this.dragData.x;
+                //   curItemY = this.dragData.y;
+                //   curItemW = this.dragData.w;
+                //   curItemH = this.dragData.h;
+                // }
                 const overX1 = Math.max(x, curItemX);
                 const overX2 = Math.min(x + w, curItemX + curItemW);
                 const overW = overX2 - overX1;
@@ -74,9 +75,14 @@ export class GridLayoutWc extends LitElement {
          * @param exceptIds 排序的id
          * @returns 交叉的GridItem 列表
          */
-        this.findOverlapItem = (x, y, w, h, exceptIds) => {
+        this.findOverlapItem = (dataList, x, y, w, h, exceptIds) => {
             const list = [];
-            const data = this.layoutData.filter((item) => !item.float);
+            let data = dataList.filter((item) => !item.float);
+            if (this.curActiveGridItem && this.dragData) {
+                if (!data.find(item => item.id === this.dragData.id)) {
+                    data = [...data, this.dragData];
+                }
+            }
             for (let i = 0; i < data.length; i++) {
                 let item = data[i];
                 if (exceptIds && exceptIds.indexOf(item.id) >= 0) {
@@ -86,12 +92,12 @@ export class GridLayoutWc extends LitElement {
                 let curItemY = item.y;
                 let curItemW = item.w;
                 let curItemH = item.h;
-                if (this.curActiveGridItem && this.curActiveGridItem.id === item.id && this.dragData) {
-                    curItemX = this.dragData.x;
-                    curItemY = this.dragData.y;
-                    curItemW = this.dragData.w;
-                    curItemH = this.dragData.h;
-                }
+                // if (this.curActiveGridItem && this.curActiveGridItem.id === item.id && this.dragData) {
+                //   curItemX = this.dragData.x;
+                //   curItemY = this.dragData.y;
+                //   curItemW = this.dragData.w;
+                //   curItemH = this.dragData.h;
+                // }
                 let x1 = Math.min(curItemX, x);
                 let x2 = Math.max(curItemX + curItemW, x + w);
                 let y1 = Math.min(curItemY, y);
@@ -114,35 +120,6 @@ export class GridLayoutWc extends LitElement {
             let x = Math.round(left / this.griddingWidth);
             let y = Math.round(top / this.griddingWidth);
             return { x, y };
-        };
-        /**
-         * 非邻国
-         * @param item
-         */
-        this.isNotNeighbor = (item) => {
-            const x1 = Math.min(item.x, this.dragData.x);
-            const x2 = Math.max(item.x + item.w, this.dragData.x + this.dragData.w);
-            const leftRight = x2 - x1 >= item.w + this.dragData.w + this.gridMargin;
-            let y1 = Math.min(item.y, this.dragData.y);
-            let y2 = Math.max(item.y + item.h, this.dragData.y + this.dragData.h);
-            const upDown = y2 - y1 >= item.h + this.dragData.h + this.gridMargin;
-            return leftRight && upDown;
-        };
-        /**
-         * 是否左右并列
-        */
-        this.isNeighborLeftRight = (item) => {
-            const x1 = Math.min(item.x, this.dragData.x);
-            const x2 = Math.max(item.x + item.w, this.dragData.x + this.dragData.w);
-            return x2 - x1 == item.w + this.dragData.w + this.gridMargin;
-        };
-        /**
-         * 是否上下并列
-         */
-        this.isNeighborUpDown = (item) => {
-            let y1 = Math.min(item.y, this.dragData.y);
-            let y2 = Math.max(item.y + item.h, this.dragData.y + this.dragData.h);
-            return y2 - y1 == item.h + this.dragData.h + this.gridMargin;
         };
         /**
          * 返回 上次的layout
@@ -214,14 +191,14 @@ export class GridLayoutWc extends LitElement {
     getEmptyBound(w, h) {
         this.stageWidth = this.getBoundingClientRect().width;
         let x = this.gridMargin, y = this.gridMargin;
-        let item = this.findBigestOverlapItem(x, y, w, h);
+        let item = this.findBigestOverlapItem(this.layoutData, x, y, w, h);
         while (item) {
             x = item.x + item.w + this.gridMargin;
             if ((x + this.gridMargin) * this.griddingWidth + w * this.griddingWidth > this.stageWidth) {
                 y += this.gridMargin;
                 x = this.gridMargin;
             }
-            item = this.findBigestOverlapItem(x, y, w, h);
+            item = this.findBigestOverlapItem(this.layoutData, x, y, w, h);
         }
         return { x, y };
     }
@@ -373,7 +350,6 @@ export class GridLayoutWc extends LitElement {
         const index = this.getGridItemIndex(event.currentTarget);
         this.layoutData.splice(index, 1);
         this.transition = false;
-        this.RenderIndex++;
         this.rearrangement();
         this.RenderIndex++;
     }
@@ -409,7 +385,6 @@ export class GridLayoutWc extends LitElement {
             this.styleMapEditing = false;
         }
         this.curMovingGridItemData = grid;
-        // this.curMovingGridItemData = this.getGridItem(event.currentTarget);
         if (!this.curMovingGridItemData)
             return;
         const { w, h, x, y, id } = this.curMovingGridItemData;
@@ -421,7 +396,6 @@ export class GridLayoutWc extends LitElement {
         this.fixPosition.top = event.clientY;
         this.oldPosition.left = this.movePosition.left;
         this.oldPosition.top = this.movePosition.top;
-        // this.curMovingGridItemData.z = 100;
         this.layoutData.forEach((item) => { if (item.id !== this.curMovingGridItemData.id)
             delete item.selected; });
         this.curMovingGridItemData.selected = true;
@@ -430,6 +404,7 @@ export class GridLayoutWc extends LitElement {
         this.dragData.x = x;
         this.dragData.y = y;
         this.transition = true;
+        this.oldLayoutData = JSON.stringify(this.layoutData);
         this.RenderIndex++;
         const onDragging = (event) => {
             if (!this.curMovingGridItemData)
@@ -473,6 +448,7 @@ export class GridLayoutWc extends LitElement {
             this.curMovingGridItemData.time = new Date().getTime();
             this.curMovingGridItemData = null;
             this.transition = false;
+            this.oldLayoutData = "";
             this.RenderIndex++;
             this.saveCurLayout();
             document.body.removeAttribute("onselectstart");
@@ -489,8 +465,11 @@ export class GridLayoutWc extends LitElement {
      * @returns {x,y}
      */
     getNearEmptyPosition(grid) {
-        let { w } = grid;
-        let { x, y } = this.getMinXY(grid);
+        let { x, y, w } = grid;
+        if (y < this.gridMargin)
+            y = this.gridMargin;
+        if (x < this.gridMargin)
+            x = this.gridMargin;
         x = x < this.gridMargin ? this.gridMargin : x;
         x = (x + w + this.gridMargin) > Math.floor(this.stageWidth / this.griddingWidth) ?
             Math.floor(this.stageWidth / this.griddingWidth) - this.gridMargin - w : x;
@@ -509,21 +488,17 @@ export class GridLayoutWc extends LitElement {
         this.styleMapEditing = false;
         this.RenderIndex++;
     }
-    //获取最小的Y座标
-    getMinXY(grid) {
+    //获取GridItem的TOP y座标
+    getGridItemTopY(dataList, grid, exceptIds) {
         let { x, h, w, y } = grid;
-        if (y <= this.gridMargin) {
-            y = this.gridMargin;
-            return { x, y };
-        }
-        const list = this.findOverlapItem(x, y, w, h, [this.curActiveGridItem.id]);
-        const exceptIds = list.map(item => item.id);
-        y = this.gridMargin;
-        let item = this.findBigestOverlapItem(x, y, w, h, [...exceptIds, this.curActiveGridItem.id]);
-        // this.calcOverArea(grid,item) >= 6
-        while (item) {
-            y = y + this.gridMargin;
-            item = this.findBigestOverlapItem(x, y, w, h, [...exceptIds, this.curActiveGridItem.id]);
+        let item = this.findBigestOverlapItem(dataList, x, y - this.gridMargin, w, h, exceptIds);
+        while (!item) {
+            y = y - this.gridMargin;
+            if (y <= this.gridMargin) {
+                y = this.gridMargin;
+                return { x, y };
+            }
+            item = this.findBigestOverlapItem(dataList, x, y - this.gridMargin, w, h, exceptIds);
         }
         return { x, y };
     }
@@ -538,59 +513,74 @@ export class GridLayoutWc extends LitElement {
         const overArea = overH * overW;
         return overArea;
     }
-    //整理Item底部重叠的地方
-    clearBottomOver() {
-        var _a;
-        const list = this.layoutData.filter(item => !item.float);
-        for (let item of list) {
-            let { x, y, w, h, id } = item;
-            if (((_a = this.curActiveGridItem) === null || _a === void 0 ? void 0 : _a.id) === id) { //不允许移动当前Item
-                x = this.dragData.x;
-                y = this.dragData.y;
-                w = this.dragData.w;
-                h = this.dragData.h;
-            }
-            let list = this.findOverlapItem(x, y, w, h, [id]);
-            list = list.filter((item) => { var _a; return item.id !== ((_a = this.curActiveGridItem) === null || _a === void 0 ? void 0 : _a.id); }); //不允许移动当前Item
-            if (list.length) {
-                for (let i = 0; i < list.length; i++) {
-                    list[i].y = y + h + this.gridMargin;
+    //排序上面有空白的地方
+    sortTopSpace(list) {
+        var _a, _b;
+        let maxWidth = Math.round(this.stageWidth / this.griddingWidth);
+        let maxHeight = Math.round(this.stageHeight / this.griddingWidth);
+        for (let sx = this.gridMargin; sx < maxWidth; sx += this.griddingWidth) {
+            for (let sy = this.gridMargin; sy < maxHeight; sy += this.griddingWidth) {
+                let w = this.griddingWidth;
+                let h = this.griddingWidth;
+                let item = this.findBigestOverlapItem(list, sx, sy, w, h, [(_a = this.curActiveGridItem) === null || _a === void 0 ? void 0 : _a.id]);
+                if (item) {
+                    let { x, y } = this.getGridItemTopY(list, item, [(_b = this.curActiveGridItem) === null || _b === void 0 ? void 0 : _b.id, item.id]);
+                    item.x = x;
+                    item.y = y;
+                    sy = item.y + item.h;
                 }
-                this.clearBottomOver();
-                return;
             }
         }
     }
-    //移除Item上面的空间
-    clearTopSpace() {
-        var _a, _b;
-        const list = this.layoutData.filter(item => !item.float);
+    //排序底部重叠的地方
+    sortBottomOver(list) {
+        var _a;
         for (let item of list) {
-            let { x, y, w, h, id } = item;
-            if (((_a = this.curActiveGridItem) === null || _a === void 0 ? void 0 : _a.id) === id) { //不允许移动当前Item
+            if (item.float) {
                 continue;
             }
-            let newY = y - this.gridMargin;
-            let hasSpace = false;
-            const exceptIds = [id];
-            if ((_b = this.curActiveGridItem) === null || _b === void 0 ? void 0 : _b.id)
-                exceptIds.push(this.curActiveGridItem.id);
-            while (newY >= this.gridMargin && !this.findBigestOverlapItem(x, newY, w, h, exceptIds)) {
-                item.y = newY;
-                newY = item.y - this.gridMargin;
-                hasSpace = true;
+            if (((_a = this.curMovingGridItemData) === null || _a === void 0 ? void 0 : _a.id) === item.id) {
+                continue;
             }
-            if (hasSpace) {
-                this.clearTopSpace();
-                return;
+            this.pressDownOver(list, item);
+        }
+    }
+    //往下压
+    pressDownOver(list, item) {
+        var _a, _b;
+        let { id, x, y, w, h } = item;
+        let newList = this.findOverlapItem(list, x, y, w, h, [id, (_a = this.dragData) === null || _a === void 0 ? void 0 : _a.id, (_b = this.curActiveGridItem) === null || _b === void 0 ? void 0 : _b.id]);
+        if (newList.length) {
+            for (let i = 0; i < newList.length; i++) {
+                newList[i].y = y + h + this.gridMargin;
+                this.pressDownOver(list, newList[i]);
             }
         }
     }
     //重新排序
     rearrangement() {
-        this.clearTopSpace();
-        this.clearBottomOver();
+        let list = [...this.layoutData];
+        if (this.curActiveGridItem) {
+            list = [...list, this.dragData];
+        }
+        this.sortBottomOver(list);
+        this.sortTopSpace(list);
+        this.layoutData = list.filter(item => {
+            if (item.id === DRAG_ID) {
+                this.dragData = item;
+                return false;
+            }
+            return true;
+        }).map(item => {
+            var _a;
+            if (item.id === ((_a = this.curActiveGridItem) === null || _a === void 0 ? void 0 : _a.id)) {
+                return this.curActiveGridItem;
+            }
+            return item;
+        });
+        this.RenderIndex++;
     }
+    //向上
     setZindexUp() {
         var _a;
         if ((_a = this.curSelectGridItem) === null || _a === void 0 ? void 0 : _a.float) {
@@ -598,6 +588,7 @@ export class GridLayoutWc extends LitElement {
             this.RenderIndex++;
         }
     }
+    //向下
     setZindexDown() {
         var _a;
         if ((_a = this.curSelectGridItem) === null || _a === void 0 ? void 0 : _a.float) {
@@ -638,6 +629,9 @@ export class GridLayoutWc extends LitElement {
         this.styleMapEditing = !this.styleMapEditing;
         this.RenderIndex++;
     }
+    scroll(e) {
+        console.log(e);
+    }
     //当前活动的GridItem
     get curActiveGridItem() {
         return this.curMovingGridItemData || this.curResizingGridItemData || null;
@@ -650,16 +644,25 @@ export class GridLayoutWc extends LitElement {
     get curSelectGridItem() {
         return this.layoutData.find(item => item.selected);
     }
-    _connectedCallback() { }
-    _disconnectedCallback() {
+    get stageHeight() {
+        let list = [...this.layoutData];
+        if (this.dragData) {
+            list = [this.dragData, ...list];
+        }
+        let h = 0;
+        list.forEach(item => {
+            h = h < item.y + item.h ? item.y + item.h : h;
+        });
+        h = h + this.gridMargin;
+        return h * this.griddingWidth;
     }
     render() {
-        var _a, _b;
+        var _a, _b, _c;
         this.stageWidth = this.getBoundingClientRect().width;
-        return html `<div class="grid-layout" @click="${this.onGridLayoutClick}">
-    <div class="grid-sitting" style="'height:${this.stageHeight}px'"></div>
+        return html `<div class="grid-layout" @click="${this.onGridLayoutClick}" @onscroll="${this.onscroll}">
+    <div class="grid-sitting" style="height:${this.stageHeight}px"></div>
     ${this.edit ? html `
-      <div class="toolbar">
+      <div class="toolbar" >
         <i class="el-icon add" @click="${this.addGridItem}" >
           <!--[-->
           <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ea893728=""><path fill="currentColor" d="M480 480V128a32 32 0 0 1 64 0v352h352a32 32 0 1 1 0 64H544v352a32 32 0 1 1-64 0V544H128a32 32 0 0 1 0-64h352z"></path></svg>
@@ -692,15 +695,16 @@ export class GridLayoutWc extends LitElement {
           <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ea893728=""><path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path></svg>
           <!--]-->
         </i>
+        
       </div>
       
-      <div style="display:${this.curSelectGridItem ? 'flex' : 'none'}" class="toolbar vertical">
-      <i class="el-icon z-index-up" @click="${this.setZindexUp}" style="display:${((_a = this.curSelectGridItem) === null || _a === void 0 ? void 0 : _a.float) ? 'flex' : 'none'}">
+      <div style="top:calc(40% + ${(_a = this.shadowRoot) === null || _a === void 0 ? void 0 : _a.host.scrollTop}px);display:${this.curSelectGridItem ? 'flex' : 'none'}"  class="toolbar vertical">
+      <i class="el-icon z-index-up" @click="${this.setZindexUp}" style="display:${((_b = this.curSelectGridItem) === null || _b === void 0 ? void 0 : _b.float) ? 'flex' : 'none'}">
         <!--[-->
           <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ea893728=""><path fill="currentColor" d="M572.235 205.282v600.365a30.118 30.118 0 1 1-60.235 0V205.282L292.382 438.633a28.913 28.913 0 0 1-42.646 0 33.43 33.43 0 0 1 0-45.236l271.058-288.045a28.913 28.913 0 0 1 42.647 0L834.5 393.397a33.43 33.43 0 0 1 0 45.176 28.913 28.913 0 0 1-42.647 0l-219.618-233.23z"></path></svg>
         <!--]-->
       </i>
-      <i class="el-icon z-index-down" @click="${this.setZindexDown}" style="display:${((_b = this.curSelectGridItem) === null || _b === void 0 ? void 0 : _b.float) ? 'flex' : 'none'}">
+      <i class="el-icon z-index-down" @click="${this.setZindexDown}" style="display:${((_c = this.curSelectGridItem) === null || _c === void 0 ? void 0 : _c.float) ? 'flex' : 'none'}">
         <!--[-->
           <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ea893728=""><path fill="currentColor" d="M544 805.888V168a32 32 0 1 0-64 0v637.888L246.656 557.952a30.72 30.72 0 0 0-45.312 0 35.52 35.52 0 0 0 0 48.064l288 306.048a30.72 30.72 0 0 0 45.312 0l288-306.048a35.52 35.52 0 0 0 0-48 30.72 30.72 0 0 0-45.312 0L544 805.824z"></path></svg>
         <!--]-->
@@ -757,12 +761,12 @@ GridLayoutWc.styles = css `
     display: block;
     padding: 0px;
     height:100%;
+    overflow-x: hidden;
   }
   .grid-layout {
     position: relative;
     width: 100%;
     height: 100%;
-    overflow-x: hidden;
   }
   .toolbar {
     position: absolute;
@@ -774,6 +778,7 @@ GridLayoutWc.styles = css `
     background: #000;
     box-shadow: 2px 2px 5px #000;
     border-radius:3px;
+    opacity:0.7;
   }
   .toolbar.vertical {
     top:20%;

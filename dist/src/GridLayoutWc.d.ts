@@ -42,6 +42,7 @@ export declare class GridLayoutWc extends LitElement {
     gridMargin: number;
     edit: boolean;
     layoutData: GridItemData[];
+    oldLayoutData: string;
     styleMapEditing: boolean;
     dragData: {
         x: number;
@@ -52,7 +53,6 @@ export declare class GridLayoutWc extends LitElement {
         id: number;
     };
     draggIng: boolean;
-    stageHeight: number;
     stageWidth: number;
     resizeFixPosition: any;
     resizeingPosition: any;
@@ -81,7 +81,7 @@ export declare class GridLayoutWc extends LitElement {
     /**
      * 查找存在的最大的重叠交叉项
      * */
-    findBigestOverlapItem: (x: number, y: number, w: number, h: number, exceptIds?: any[]) => GridItemData | undefined;
+    findBigestOverlapItem: (dataList: GridItemData[], x: number, y: number, w: number, h: number, exceptIds?: any[]) => GridItemData | undefined;
     /**
      * 获取交叉的GridItem 列表
      * @param x x
@@ -91,7 +91,7 @@ export declare class GridLayoutWc extends LitElement {
      * @param exceptIds 排序的id
      * @returns 交叉的GridItem 列表
      */
-    findOverlapItem: (x: number, y: number, w: number, h: number, exceptIds?: any[]) => GridItemData[];
+    findOverlapItem: (dataList: GridItemData[], x: number, y: number, w: number, h: number, exceptIds?: any[]) => GridItemData[];
     /**
      * Resize start
      * @param event MouseEvent
@@ -141,19 +141,6 @@ export declare class GridLayoutWc extends LitElement {
         y: number;
     };
     /**
-     * 非邻国
-     * @param item
-     */
-    isNotNeighbor: (item: GridItemData) => boolean;
-    /**
-     * 是否左右并列
-    */
-    isNeighborLeftRight: (item: GridItemData) => boolean;
-    /**
-     * 是否上下并列
-     */
-    isNeighborUpDown: (item: GridItemData) => boolean;
-    /**
      * 返回 上次的layout
      * @returns JSON
      */
@@ -169,23 +156,24 @@ export declare class GridLayoutWc extends LitElement {
     close: () => void;
     gridItemFloat: (event: PointerEvent) => void;
     onGridLayoutClick(event: any): void;
-    getMinXY(grid: ItemData): {
+    getGridItemTopY(dataList: GridItemData[], grid: ItemData, exceptIds: any[]): {
         x: number;
         y: number;
     };
     calcOverArea(data1: ItemData, data2: ItemData): number;
-    clearBottomOver(): void;
-    clearTopSpace(): void;
+    sortTopSpace(list: GridItemData[]): void;
+    sortBottomOver(list: GridItemData[]): void;
+    pressDownOver(list: GridItemData[], item: GridItemData): void;
     rearrangement(): void;
     setZindexUp(): void;
     setZindexDown(): void;
     renderStyleSet(): import("lit-html").TemplateResult<1> | "";
     openSetStyle(): void;
+    scroll(e: any): void;
     get curActiveGridItem(): any;
     get curActiveGridItemStyle(): any;
     get curSelectGridItem(): GridItemData | undefined;
-    _connectedCallback(): void;
-    _disconnectedCallback(): void;
+    get stageHeight(): number;
     render(): import("lit-html").TemplateResult<1>;
     static styles: import("lit").CSSResult;
 }
