@@ -37,3 +37,5 @@ To run a local development server that serves the basic demo located in `demo/in
 ```bash
 npm publish
 ```
+
+## vue demo
