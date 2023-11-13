@@ -38,9 +38,15 @@
         id:4,w:30,h:12,x:94,y:1,slot:'slt4'
       }
     ];
+    const onClose = (e) => {
+      console.log('close',e);
+    }
+    const onSave = (e) => {
+      console.log('save',e);
+    }
     render(
       html`
-        <grid-layout-wc .layoutData=${layoutData} .edit="${true}"></grid-layout-wc>
+        <grid-layout-wc .layoutData=${layoutData} .edit="${true}" @close="${onClose}" @save="${onSave}"></grid-layout-wc>
       `,
       document.querySelector('#demo')
     );

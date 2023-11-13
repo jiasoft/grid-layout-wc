@@ -456,14 +456,29 @@ export class GridLayoutWc extends LitElement {
    * @returns {x,y}
    */
   getNearEmptyPosition(grid: GridItemData) {
-    let { x,y,w} = grid;
+    let { x,y,w,h} = grid;
     if(y < this.gridMargin) y = this.gridMargin;
     if(x < this.gridMargin) x = this.gridMargin;
     x = x < this.gridMargin ? this.gridMargin : x;
     x = (x + w + this.gridMargin) > Math.floor(this.stageWidth / this.griddingWidth) ?
       Math.floor(this.stageWidth / this.griddingWidth) - this.gridMargin - w : x;
+    const overList = this.findOverlapItem(this.layoutData,x,y,w,h,[this.dragData.id,this.curActiveGridItem.id]);
+    overList.forEach( overItem => {
+      let overW = w + overItem.w - (Math.max(x + w , overItem.x + overItem.w) - Math.min(x , overItem.x));
+      let overH = h + overItem.h - (Math.max(y + h , overItem.y + overItem.h) - Math.min(y , overItem.y));
+      if( overH < overW){
+        if( overH < 10) {
+          if(y < overItem.y)  y =overItem.y - h - this.gridMargin;
+          else y = overItem.y + overItem.h + this.gridMargin ;
+        }
+      }else {
+        if( overW < 10) {
+          if(x < overItem.x)  x = overItem.x - w - this.gridMargin;
+          else return x =overItem.x + overItem.w + this.gridMargin;
+        }
+      }
+    });
     return { x, y };
-
   }
 
   /**
@@ -498,6 +513,11 @@ export class GridLayoutWc extends LitElement {
   //关闭事件
   close = () => {
     const emit: any = new Event('close');
+    emit.detail = this.layoutData;
+    this.dispatchEvent(emit);
+  }
+  save = () => {
+    const emit: any = new Event('save');
     emit.detail = this.layoutData;
     this.dispatchEvent(emit);
   }
@@ -763,7 +783,7 @@ export class GridLayoutWc extends LitElement {
           </svg>
           <!--]-->
         </i>
-        <i class="el-icon save" @click="${this.saveCurLayout}">
+        <i class="el-icon save" @click="${this.save}">
           <!--[-->
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
             <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
@@ -771,7 +791,7 @@ export class GridLayoutWc extends LitElement {
           </svg>
           <!--]-->
         </i>
-        <i class="el-icon close">
+        <i class="el-icon close" @click="${this.close}">
           <!--[-->
           <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" data-v-ea893728=""><path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path></svg>
           <!--]-->
@@ -829,6 +849,20 @@ export class GridLayoutWc extends LitElement {
     padding: 0px;
     height:100%;
     overflow-x: hidden;
+  }
+  :host::-webkit-scrollbar{
+    width: 8px;
+    background: #b3b3b3;
+   
+  }
+  :host::-webkit-scrollbar-thumb{
+    width: 8px;
+    background: #767676;
+    border-radius: 5px;
+  }
+  :host::-webkit-scrollbar-track{
+    background: transparent;
+    border-radius: 0px;
   }
   .grid-layout {
     position: relative;

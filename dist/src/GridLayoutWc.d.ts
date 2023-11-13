@@ -154,6 +154,7 @@ export declare class GridLayoutWc extends LitElement {
     /** 打开下一步的layout */
     forwardLayout: () => void;
     close: () => void;
+    save: () => void;
     gridItemFloat: (event: PointerEvent) => void;
     onGridLayoutClick(event: any): void;
     getGridItemTopY(dataList: GridItemData[], grid: ItemData, exceptIds: any[]): {
