@@ -46,9 +46,13 @@ export class GridLayoutWc extends LitElement {
   draggIng: boolean = false;
   // stageHeight: number = 0;
   stageWidth: number = 1000;
+
+  /** resize相关 */
   resizeFixPosition: any = { top: 0, left: 0 };
   resizeingPosition: any = { top: 0, left: 0 };
+  resizeFixGridItemData:GridItemData|null = null;
   curResizingGridItemData: any | null = null;
+  
   dataStore: any[] = [];
   dataStoreIndex: number = 0;
   curMovingGridItemData: any | null = null;
@@ -191,6 +195,7 @@ export class GridLayoutWc extends LitElement {
 
     const index = this.getGridItemIndex(event.currentTarget);
     this.curResizingGridItemData = this.layoutData[index];
+    this.resizeFixGridItemData = {...this.layoutData[index]};
     this.resizeFixPosition.left = event.clientX;
     this.resizeFixPosition.top = event.clientY;
     this.resizeingPosition.left = event.clientX;
@@ -227,12 +232,12 @@ export class GridLayoutWc extends LitElement {
     if (!this.edit) return;
     this.resizeingPosition.left = event.clientX;
     this.resizeingPosition.top = event.clientY;
-
-    let w = this.curResizingGridItemData.w + Math.round((this.resizeingPosition.left - this.resizeFixPosition.left) / this.griddingWidth);
-    let h = this.curResizingGridItemData.h + Math.round((this.resizeingPosition.top - this.resizeFixPosition.top) / this.griddingWidth);
-    let x = this.curResizingGridItemData.x;
-    let y = this.curResizingGridItemData.y;
-    let z = this.curResizingGridItemData.z;
+    if(!this.resizeFixGridItemData) return;
+    let w = this.resizeFixGridItemData?.w + Math.round((this.resizeingPosition.left - this.resizeFixPosition.left) / this.griddingWidth);
+    let h = this.resizeFixGridItemData?.h + Math.round((this.resizeingPosition.top - this.resizeFixPosition.top) / this.griddingWidth);
+    let x = this.resizeFixGridItemData?.x;
+    let y = this.resizeFixGridItemData?.y;
+    let z = this.resizeFixGridItemData?.z;
 
     if (this.curResizingGridItemData.float) {
       this.draggIng = true;
@@ -241,11 +246,12 @@ export class GridLayoutWc extends LitElement {
       this.dragData.w = w;
       this.dragData.h = h;
       this.dragData.z = z;
+      this.curResizingGridItemData.style = { width:w * this.griddingWidth, height:h* this.griddingWidth, left: x * this.griddingWidth, top: y * this.griddingWidth };
       this.RenderIndex++;
       return;
     }
-    let height = this.curResizingGridItemData.h * this.griddingWidth + (this.resizeingPosition.top - this.resizeFixPosition.top)
-    let width = this.curResizingGridItemData.w * this.griddingWidth + (this.resizeingPosition.left - this.resizeFixPosition.left);
+    let height = this.resizeFixGridItemData.h * this.griddingWidth + (this.resizeingPosition.top - this.resizeFixPosition.top)
+    let width = this.resizeFixGridItemData.w * this.griddingWidth + (this.resizeingPosition.left - this.resizeFixPosition.left);
     if (width > this.stageWidth - x * this.griddingWidth) {
       width = this.stageWidth - x * this.griddingWidth;
     }

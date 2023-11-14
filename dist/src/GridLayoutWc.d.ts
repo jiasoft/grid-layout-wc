@@ -54,8 +54,10 @@ export declare class GridLayoutWc extends LitElement {
     };
     draggIng: boolean;
     stageWidth: number;
+    /** resize相关 */
     resizeFixPosition: any;
     resizeingPosition: any;
+    resizeFixGridItemData: GridItemData | null;
     curResizingGridItemData: any | null;
     dataStore: any[];
     dataStoreIndex: number;
