@@ -39,3 +39,7 @@ npm publish
 ```
 
 ## vue demo
+https://github.com/jiasoft/vue-demo-grid-layout-wc
+
+## angular demo 
+https://github.com/jiasoft/ng-demo-grid-layout-wc

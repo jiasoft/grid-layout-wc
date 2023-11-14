@@ -116,8 +116,9 @@ export declare class GridLayoutWc extends LitElement {
     getGridItemStyle(data: GridItemData): string;
     /** 保存Layout */
     saveCurLayout(): void;
+    animateGridItem(item: GridItemData, w?: number, h?: number): Promise<unknown>;
     /** 移除GridImte */
-    gridItemClose(event: PointerEvent): void;
+    gridItemClose(event: PointerEvent): Promise<void>;
     getGridItemIndex(target: any): number;
     getGridItem(target: any): GridItemData;
     /**

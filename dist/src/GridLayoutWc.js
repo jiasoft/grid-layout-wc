@@ -329,7 +329,7 @@ export class GridLayoutWc extends LitElement {
       transition:none;
       left:${data.style.left}px;
       top:${data.style.top}px;
-      z-index:${data.float ? FloatZindex + data.z || 0 : ActiveZindex};
+      z-index:${data.float ? FloatZindex + (data.z || 0) : ActiveZindex};
       width:${data.style.width}px; 
       height:${data.style.height}px`;
         }
@@ -338,7 +338,7 @@ export class GridLayoutWc extends LitElement {
         if (data.id === DRAG_ID)
             zIndex = DragZInxex;
         if (data.float)
-            zIndex = FloatZindex + data.z || 0;
+            zIndex = FloatZindex + (data.z || 0);
         return `
       left:${style.left}px;
       top:${style.top}px;
@@ -359,9 +359,36 @@ export class GridLayoutWc extends LitElement {
             this.dataStore[this.dataStoreIndex] = json;
         }
     }
+    animateGridItem(item, w = 3, h = 2) {
+        return new Promise(resolve => {
+            const minusW = (item.w - w) / 5;
+            const minusH = (item.h - h) / 5;
+            const animate = () => {
+                item.w -= minusW;
+                item.h -= minusH;
+                if (item.w < w) {
+                    item.w = w;
+                }
+                if (item.h < h) {
+                    item.h = h;
+                }
+                this.rearrangement();
+                this.RenderIndex++;
+                if (item.w > w || item.h > h) {
+                    window.requestAnimationFrame(() => { animate(); });
+                }
+                else {
+                    resolve(null);
+                }
+            };
+            animate();
+        });
+    }
     /** 移除GridImte */
-    gridItemClose(event) {
+    async gridItemClose(event) {
         const index = this.getGridItemIndex(event.currentTarget);
+        const item = this.layoutData[index];
+        await this.animateGridItem(item, 3, 3);
         this.layoutData.splice(index, 1);
         this.transition = false;
         this.rearrangement();
@@ -907,8 +934,8 @@ GridLayoutWc.styles = css `
   .grid-item {
     display:block;
     position:absolute;
-    min-width: 80px;
-    min-height: 50px;
+    min-width: 20px;
+    min-height: 10px;
     border-radius: 3px;
     overflow:hidden;
     background-color:#fff;
