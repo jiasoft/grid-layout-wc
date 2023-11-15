@@ -3,7 +3,7 @@
   "description": "Webcomponent grid-layout-wc following open-wc recommendations",
   "license": "MIT",
   "author": "grid-layout-wc",
-  "version": "0.0.11",
+  "version": "0.1.4",
   "type": "module",
   "main": "dist/src/index.js",
   "module": "dist/src/index.js",

@@ -176,8 +176,8 @@ export declare class GridLayoutWc extends LitElement {
     rearrangement(): void;
     setZindexUp(): void;
     setZindexDown(): void;
-    renderStyleSet(): "" | import("lit-html").TemplateResult<1>;
-    renderToobar(): "" | import("lit-html").TemplateResult<1>;
+    renderStyleSet(): import("lit-html").TemplateResult<1> | "";
+    renderToobar(): import("lit-html").TemplateResult<1> | "";
     openSetStyle(): void;
     get curActiveGridItem(): any;
     get curActiveGridItemStyle(): any;
