@@ -5,6 +5,19 @@ interface ItemData {
     w: number;
     h: number;
 }
+interface GridItemStyleTyoe {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+}
+type CSSType = {
+    borderWidth?: string;
+    borderColor?: string;
+    borderStyle?: string;
+    backgroundColor?: string;
+    borderRadius?: string;
+};
 interface GridItemData extends ItemData {
     id: number;
     z: number;
@@ -14,12 +27,8 @@ interface GridItemData extends ItemData {
     title?: string;
     float?: boolean;
     slot?: string;
-    style?: {
-        left: number;
-        top: number;
-        width: number;
-        height: number;
-    };
+    style?: GridItemStyleTyoe;
+    userStyle?: CSSType;
 }
 type HtmlPosition = {
     left: number;
@@ -29,15 +38,9 @@ type GridPosition = {
     x: number;
     y: number;
 };
-type StyleType = {
-    borderWidth: number;
-    borderColor: string;
-    borderStyle: string;
-    backgroundColor: string;
-};
 export declare class GridLayoutWc extends LitElement {
     RenderIndex: number;
-    stylemap: StyleType;
+    static stylemap: CSSType;
     griddingWidth: number;
     gridMargin: number;
     edit: boolean;
@@ -66,6 +69,7 @@ export declare class GridLayoutWc extends LitElement {
     fixPosition: HtmlPosition;
     oldPosition: HtmlPosition;
     transition: boolean;
+    reRender(): void;
     drawDragDataHtml(): import("lit-html").TemplateResult<1>;
     constructor();
     findGridItemData: (id: any) => GridItemData | undefined;
@@ -117,7 +121,7 @@ export declare class GridLayoutWc extends LitElement {
     /** 保存Layout */
     saveCurLayout(): void;
     animateGridItem(item: GridItemData, w?: number, h?: number): Promise<unknown>;
-    /** 移除GridImte */
+    /** 移除GridItem */
     gridItemClose(event: PointerEvent): Promise<void>;
     getGridItemIndex(target: any): number;
     getGridItem(target: any): GridItemData;
@@ -165,18 +169,20 @@ export declare class GridLayoutWc extends LitElement {
         y: number;
     };
     calcOverArea(data1: ItemData, data2: ItemData): number;
+    changeInput(attr: "borderStyle" | "borderColor" | "borderWidth" | "backgroundColor" | "borderRadius", e: any): void;
     sortTopSpace(list: GridItemData[]): void;
     sortBottomOver(list: GridItemData[]): void;
     pressDownOver(list: GridItemData[], item: GridItemData): void;
     rearrangement(): void;
     setZindexUp(): void;
     setZindexDown(): void;
-    renderStyleSet(): import("lit-html").TemplateResult<1> | "";
-    renderToobar(): import("lit-html").TemplateResult<1> | "";
+    renderStyleSet(): "" | import("lit-html").TemplateResult<1>;
+    renderToobar(): "" | import("lit-html").TemplateResult<1>;
     openSetStyle(): void;
     get curActiveGridItem(): any;
     get curActiveGridItemStyle(): any;
     get curSelectGridItem(): GridItemData | undefined;
+    get curSelectGridItemUserStyle(): CSSType | undefined;
     get stageHeight(): number;
     render(): import("lit-html").TemplateResult<1>;
     static styles: import("lit").CSSResult;
