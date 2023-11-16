@@ -43,3 +43,6 @@ https://github.com/jiasoft/vue-demo-grid-layout-wc
 
 ## angular demo 
 https://github.com/jiasoft/ng-demo-grid-layout-wc
+
+## react demo
+https://github.com/jiasoft/react-demo-grid-layout-wc
