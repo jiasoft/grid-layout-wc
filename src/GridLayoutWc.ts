@@ -738,83 +738,6 @@ export class GridLayoutWc extends LitElement {
     });
     this.reRender();;
   }
-  renderStyleSet() {
-    return this.styleMapEditing ? html`
-    <div class="style-set">
-      <div class="head">Style</div>
-      <div class="item">
-        <span class="lab">border-width:</span>
-        <div class="ctr">
-          <input class="ctr-input" type="number" min="0" max="10"
-            value="${this.curSelectGridItemUserStyle?.borderWidth||0}"
-            @change="${(e:any)=>{this.changeInput('borderWidth',e)}}" />
-        </div>
-      </div>
-      <div class="item">
-        <span class="lab">border-style:</span>
-        <div class="ctr">
-          <select class="ctr-input" 
-            value="${this.curSelectGridItemUserStyle?.borderStyle||''}"
-            @change="${(e:any)=>{this.changeInput('borderStyle',e)}}">
-            <option value=""></option>
-            <option value="solid">solid</option>
-            <option value="dotted">dotted</option>
-            <option value="double">double</option>
-            <option value="dashed">dashed</option>
-            <option value="hidden">hidden</option>
-            <option value="inset">inset</option>
-            <option value="outset">outset</option>
-            <option value="ridge">ridge</option>    
-            <option value="none">none</option>
-          </select>
-        </div>
-      </div>
-      <div class="item">
-        <span class="lab">border-color:</span>
-        <div class="ctr">
-          <input class="ctr-input"  type="color"
-          value="${this.curSelectGridItemUserStyle?.borderColor||''}" 
-          @change="${(e:any)=>{this.changeInput('borderColor',e)}}" />
-        </div>
-      </div>
-      <div class="item">
-        <span class="lab">border-radius:</span>
-        <div class="ctr">
-          <input class="ctr-input"  type="number" min="0" max="10"
-          value="${this.curSelectGridItemUserStyle?.borderRadius||''}" 
-          @change="${(e:any)=>{this.changeInput('borderRadius',e)}}" />
-        </div>
-      </div>
-      <div class="item">
-        <span class="lab">background-color:</span>
-        <div class="ctr">
-          <input class="ctr-input" type="color" 
-            value="${this.curSelectGridItemUserStyle?.backgroundColor||''}" 
-            @change="${(e:any)=>{this.changeInput('backgroundColor',e)}}" />
-        </div>
-      </div>
-    </div>`:``;
-  }
-  renderToobar(){
-    if(!this.edit) return '';
-    return html`<div class="tool-box">
-      
-    <i class="el-icon set-float">
-      <!--[-->
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-subtract" viewBox="0 0 16 16">
-        <path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
-      </svg>
-      <!--]-->
-    </i>
-    <i class="el-icon close grid-item-close" style="font-size:20px;" >
-      <!--[-->
-      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path></svg>
-      <!--]-->
-    </i>
-  </div>
-  <div class="resize bottom-right" @mousedown="${this.gridItemResizeStart}" ></div>`
-
-  }
   openSetStyle(){
     if(!this.curSelectGridItem) return;
     if(!this.curSelectGridItem.userStyle){
@@ -865,6 +788,9 @@ export class GridLayoutWc extends LitElement {
     })
     h = h + this.gridMargin;
     return h * this.griddingWidth;
+  }
+  connectedCallback() {
+    super.connectedCallback();
   }
   render() {
     
@@ -953,6 +879,83 @@ export class GridLayoutWc extends LitElement {
     ${this.draggIng ? this.drawDragDataHtml() : ''}
   </div>
     `;
+  }
+  renderStyleSet() {
+    return this.styleMapEditing ? html`
+    <div class="style-set">
+      <div class="head">Style</div>
+      <div class="item">
+        <span class="lab">border-width:</span>
+        <div class="ctr">
+          <input class="ctr-input" type="number" min="0" max="10"
+            value="${this.curSelectGridItemUserStyle?.borderWidth||0}"
+            @change="${(e:any)=>{this.changeInput('borderWidth',e)}}" />
+        </div>
+      </div>
+      <div class="item">
+        <span class="lab">border-style:</span>
+        <div class="ctr">
+          <select class="ctr-input" 
+            value="${this.curSelectGridItemUserStyle?.borderStyle||''}"
+            @change="${(e:any)=>{this.changeInput('borderStyle',e)}}">
+            <option value=""></option>
+            <option value="solid">solid</option>
+            <option value="dotted">dotted</option>
+            <option value="double">double</option>
+            <option value="dashed">dashed</option>
+            <option value="hidden">hidden</option>
+            <option value="inset">inset</option>
+            <option value="outset">outset</option>
+            <option value="ridge">ridge</option>    
+            <option value="none">none</option>
+          </select>
+        </div>
+      </div>
+      <div class="item">
+        <span class="lab">border-color:</span>
+        <div class="ctr">
+          <input class="ctr-input"  type="color"
+          value="${this.curSelectGridItemUserStyle?.borderColor||''}" 
+          @change="${(e:any)=>{this.changeInput('borderColor',e)}}" />
+        </div>
+      </div>
+      <div class="item">
+        <span class="lab">border-radius:</span>
+        <div class="ctr">
+          <input class="ctr-input"  type="number" min="0" max="10"
+          value="${this.curSelectGridItemUserStyle?.borderRadius||''}" 
+          @change="${(e:any)=>{this.changeInput('borderRadius',e)}}" />
+        </div>
+      </div>
+      <div class="item">
+        <span class="lab">background-color:</span>
+        <div class="ctr">
+          <input class="ctr-input" type="color" 
+            value="${this.curSelectGridItemUserStyle?.backgroundColor||''}" 
+            @change="${(e:any)=>{this.changeInput('backgroundColor',e)}}" />
+        </div>
+      </div>
+    </div>`:``;
+  }
+  renderToobar(){
+    if(!this.edit) return '';
+    return html`<div class="tool-box">
+      
+    <i class="el-icon set-float">
+      <!--[-->
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-subtract" viewBox="0 0 16 16">
+        <path d="M0 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2H2a2 2 0 0 1-2-2V2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H2z"/>
+      </svg>
+      <!--]-->
+    </i>
+    <i class="el-icon close grid-item-close" style="font-size:20px;" >
+      <!--[-->
+      <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path fill="currentColor" d="M764.288 214.592 512 466.88 259.712 214.592a31.936 31.936 0 0 0-45.12 45.12L466.752 512 214.528 764.224a31.936 31.936 0 1 0 45.12 45.184L512 557.184l252.288 252.288a31.936 31.936 0 0 0 45.12-45.12L557.12 512.064l252.288-252.352a31.936 31.936 0 1 0-45.12-45.184z"></path></svg>
+      <!--]-->
+    </i>
+  </div>
+  <div class="resize bottom-right" @mousedown="${this.gridItemResizeStart}" ></div>`
+
   }
   static styles = css`
   :host {
@@ -1060,7 +1063,7 @@ export class GridLayoutWc extends LitElement {
     outline:2px solid #a2c1d6;
   }
   .grid-item[float="true"] {
-    box-shadow:rgb(0, 0, 0) 5px 5px 24px -10px;
+    box-shadow:rgb(0, 0, 0) 5px 5px 14px -10px;
   }
   .grid-item[float="true"] .tool-box .set-float {
     opacity: 1;
