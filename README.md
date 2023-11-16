@@ -8,14 +8,49 @@ This webcomponent follows the [open-wc](https://github.com/open-wc/open-wc) reco
 npm i grid-layout-wc
 ```
 
-## Usage
+## Usage VUE DEMO
 
 ```html
 <script type="module">
   import 'grid-layout-wc/grid-layout-wc.js';
+  const layoutList = [
+    {x: 1, y: 1, w: 44, h: 40,"slot":"1","id":1},
+    {x: 46, y: 1, w: 81, h: 40,"slot":"2","id":2},
+    {x: 1, y: 42, w: 69, h: 35,"slot":"3","id":3},
+    {x: 71, y: 42, w: 56, h: 35,"slot":"4","id":4},
+    {x: 1, y: 55, w: 37, h: 34,"slot":"5","id":5,float: true}
+  ]
+  const isEdit = ref(false);
+  const onEdit = (e) => {
+    console.log(e)
+    isEdit.value = true;
+  }
+  const onClose = (e) => {
+    console.log(e);
+    isEdit.value = false;
+  }
+  const onSave = (e) => {
+    console.log(e);
+  }
 </script>
 
-<grid-layout-wc></grid-layout-wc>
+<grid-layout-wc :layoutData="layoutList" :edit="isEdit" @close="onClose" @save="onSave">
+  <div slot="1">
+    <highcharts01 />
+  </div>
+  <div slot="2">
+    <highcharts02 />
+  </div>
+  <div slot="3" >
+    <highcharts03 />
+  </div>
+  <div slot="4" >
+    <highcharts04 />
+  </div>
+  <div slot="5">
+    <highcharts05 />
+  </div>
+</grid-layout-wc>
 ```
 
 
