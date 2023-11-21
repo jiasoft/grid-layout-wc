@@ -508,6 +508,7 @@ export class GridLayoutWc extends LitElement {
    * @returns {x,y}
    */
   getNearEmptyPosition(grid: GridItemData) {
+    const overMax = 10;
     let { x,y,w,h} = grid;
     if(y < this.gridMargin) y = this.gridMargin;
     if(x < this.gridMargin) x = this.gridMargin;
@@ -519,12 +520,12 @@ export class GridLayoutWc extends LitElement {
       let overW = w + overItem.w - (Math.max(x + w , overItem.x + overItem.w) - Math.min(x , overItem.x));
       let overH = h + overItem.h - (Math.max(y + h , overItem.y + overItem.h) - Math.min(y , overItem.y));
       if( overH < overW){
-        if( overH < 10) {
-          if(y < overItem.y)  y =overItem.y - h - this.gridMargin;
+        if( overH < overMax && overH < overItem.h && overH < h) {
+          if(y < overItem.y)  y = overItem.y - h - this.gridMargin;
           else y = overItem.y + overItem.h + this.gridMargin ;
         }
       }else {
-        if( overW < 10) {
+        if( overW < overMax && overW < overItem.w && overW < w) {
           if(x < overItem.x)  x = overItem.x - w - this.gridMargin;
           else return x =overItem.x + overItem.w + this.gridMargin;
         }
@@ -624,7 +625,7 @@ export class GridLayoutWc extends LitElement {
     const overArea = overH * overW;
     return overArea;
   }
-  changeInput(attr:"borderStyle"|"borderColor"|"borderWidth"|"backgroundColor"|"borderRadius",e:any){
+  changeInput(attr: "borderStyle" | "borderColor" | "borderWidth" | "backgroundColor" | "borderRadius", e:any){
     if(this.curSelectGridItemUserStyle){
       this.curSelectGridItemUserStyle[attr] = e.currentTarget.value;
       this.reRender();
@@ -665,7 +666,7 @@ export class GridLayoutWc extends LitElement {
   //往下压
   pressDownOver(list:GridItemData[], item:GridItemData){
     let {id,x,y,w,h} = item;
-    let newList = this.findOverlapItem(list,x, y, w, h, [id,this.dragData?.id,this.curActiveGridItem?.id]);
+    let newList = this.findOverlapItem(list,x, y, w, h, [id, this.dragData?.id, this.curActiveGridItem?.id]);
      
       if (newList.length) {
         for (let i = 0; i < newList.length; i++) {

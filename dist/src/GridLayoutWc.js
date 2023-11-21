@@ -521,6 +521,7 @@ export class GridLayoutWc extends LitElement {
      * @returns {x,y}
      */
     getNearEmptyPosition(grid) {
+        const overMax = 10;
         let { x, y, w, h } = grid;
         if (y < this.gridMargin)
             y = this.gridMargin;
@@ -534,7 +535,7 @@ export class GridLayoutWc extends LitElement {
             let overW = w + overItem.w - (Math.max(x + w, overItem.x + overItem.w) - Math.min(x, overItem.x));
             let overH = h + overItem.h - (Math.max(y + h, overItem.y + overItem.h) - Math.min(y, overItem.y));
             if (overH < overW) {
-                if (overH < 10) {
+                if (overH < overMax && overH < overItem.h && overH < h) {
                     if (y < overItem.y)
                         y = overItem.y - h - this.gridMargin;
                     else
@@ -542,7 +543,7 @@ export class GridLayoutWc extends LitElement {
                 }
             }
             else {
-                if (overW < 10) {
+                if (overW < overMax && overW < overItem.w && overW < w) {
                     if (x < overItem.x)
                         x = overItem.x - w - this.gridMargin;
                     else
