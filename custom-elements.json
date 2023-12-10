@@ -77,6 +77,14 @@
             },
             {
               "kind": "field",
+              "name": "hideToolbar",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
               "name": "oldLayoutData",
               "type": {
                 "text": "string"
@@ -215,7 +223,7 @@
             {
               "kind": "field",
               "name": "findGridItemData",
-              "default": "(id: any): GridItemData | undefined => {\n    return this.layoutData.find((item: GridItemData) => item.id === id);\n  }"
+              "default": "(id: any): GridItemData | undefined => {\r\n    return this.layoutData.find((item: GridItemData) => item.id === id);\r\n  }"
             },
             {
               "kind": "method",
@@ -248,13 +256,13 @@
             {
               "kind": "field",
               "name": "findBigestOverlapItem",
-              "default": "(dataList:GridItemData[],x: number, y: number, w: number, h: number, exceptIds?: any[]): GridItemData | undefined => {\n    const list = this.findOverlapItem(dataList,x, y, w, h, exceptIds);\n    let BigestOverlapArea = -99999999999; //最大的重叠交叉面积\n    let BigestOverlapItem: any = undefined;\n    list.forEach((item: any) => {\n      let curItemX = item.x;\n      let curItemY = item.y;\n      let curItemW = item.w;\n      let curItemH = item.h;\n      // if (this.curActiveGridItem && this.curActiveGridItem.id === item.id && this.dragData) {\n      //   curItemX = this.dragData.x;\n      //   curItemY = this.dragData.y;\n      //   curItemW = this.dragData.w;\n      //   curItemH = this.dragData.h;\n      // }\n      const overX1 = Math.max(x, curItemX);\n      const overX2 = Math.min(x + w, curItemX + curItemW);\n      const overW = overX2 - overX1;\n      const overY1 = Math.max(y, curItemY);\n      const overY2 = Math.min(y + h, curItemY + curItemH);\n      const overH = overY2 - overY1;\n      const overArea = overH * overW;\n      if (overArea > BigestOverlapArea) {\n        BigestOverlapArea = overArea;\n        BigestOverlapItem = item;\n      }\n    });\n\n    return BigestOverlapItem;\n  }",
+              "default": "(dataList:GridItemData[],x: number, y: number, w: number, h: number, exceptIds?: any[]): GridItemData | undefined => {\r\n    const list = this.findOverlapItem(dataList,x, y, w, h, exceptIds);\r\n    let BigestOverlapArea = -99999999999; //最大的重叠交叉面积\r\n    let BigestOverlapItem: any = undefined;\r\n    list.forEach((item: any) => {\r\n      let curItemX = item.x;\r\n      let curItemY = item.y;\r\n      let curItemW = item.w;\r\n      let curItemH = item.h;\r\n      // if (this.curActiveGridItem && this.curActiveGridItem.id === item.id && this.dragData) {\r\n      //   curItemX = this.dragData.x;\r\n      //   curItemY = this.dragData.y;\r\n      //   curItemW = this.dragData.w;\r\n      //   curItemH = this.dragData.h;\r\n      // }\r\n      const overX1 = Math.max(x, curItemX);\r\n      const overX2 = Math.min(x + w, curItemX + curItemW);\r\n      const overW = overX2 - overX1;\r\n      const overY1 = Math.max(y, curItemY);\r\n      const overY2 = Math.min(y + h, curItemY + curItemH);\r\n      const overH = overY2 - overY1;\r\n      const overArea = overH * overW;\r\n      if (overArea > BigestOverlapArea) {\r\n        BigestOverlapArea = overArea;\r\n        BigestOverlapItem = item;\r\n      }\r\n    });\r\n\r\n    return BigestOverlapItem;\r\n  }",
               "description": "查找存在的最大的重叠交叉项"
             },
             {
               "kind": "field",
               "name": "findOverlapItem",
-              "default": "(dataList:GridItemData[],x: number, y: number, w: number, h: number, exceptIds?: any[], overCount:number = 0): GridItemData[] => {\n   \n    const list: GridItemData[] = [];\n    let data = dataList.filter((item: any) => !item.float);\n    if(this.curActiveGridItem && this.dragData ) {\n      if(!data.find(item => item.id ===this.dragData.id)){\n        data = [...data,this.dragData]\n      }\n      \n    }\n    for (let i = 0; i < data.length; i++) {\n      let item = data[i];\n      if (exceptIds && exceptIds.indexOf(item.id) >= 0) {\n        continue;\n      }\n      let curItemX = item.x;\n      let curItemY = item.y;\n      let curItemW = item.w;\n      let curItemH = item.h;\n      let x1 = Math.min(curItemX, x);\n      let x2 = Math.max(curItemX + curItemW, x + w);\n\n\n      let y1 = Math.min(curItemY, y);\n      let y2 = Math.max(curItemY + curItemH, y + h);\n\n      //是否存在交叉的算法\n      if (((x2 - x1) - (curItemW + w) + overCount) < this.gridMargin &&\n        ((y2 - y1) - (curItemH + h) + overCount) < this.gridMargin ) {\n        list.push(item);\n      }\n    }\n    return list;\n  }",
+              "default": "(dataList:GridItemData[],x: number, y: number, w: number, h: number, exceptIds?: any[], overCount:number = 0): GridItemData[] => {\r\n   \r\n    const list: GridItemData[] = [];\r\n    let data = dataList.filter((item: any) => !item.float);\r\n    if(this.curActiveGridItem && this.dragData ) {\r\n      if(!data.find(item => item.id ===this.dragData.id)){\r\n        data = [...data,this.dragData]\r\n      }\r\n      \r\n    }\r\n    for (let i = 0; i < data.length; i++) {\r\n      let item = data[i];\r\n      if (exceptIds && exceptIds.indexOf(item.id) >= 0) {\r\n        continue;\r\n      }\r\n      let curItemX = item.x;\r\n      let curItemY = item.y;\r\n      let curItemW = item.w;\r\n      let curItemH = item.h;\r\n      let x1 = Math.min(curItemX, x);\r\n      let x2 = Math.max(curItemX + curItemW, x + w);\r\n\r\n\r\n      let y1 = Math.min(curItemY, y);\r\n      let y2 = Math.max(curItemY + curItemH, y + h);\r\n\r\n      //是否存在交叉的算法\r\n      if (((x2 - x1) - (curItemW + w) + overCount) < this.gridMargin &&\r\n        ((y2 - y1) - (curItemH + h) + overCount) < this.gridMargin ) {\r\n        list.push(item);\r\n      }\r\n    }\r\n    return list;\r\n  }",
               "description": "获取交叉的GridItem 列表",
               "parameters": [
                 {
@@ -425,7 +433,7 @@
             {
               "kind": "field",
               "name": "calcNearPosition",
-              "default": "(left: number, top: number): GridPosition => {\n    let x = Math.round(left / this.griddingWidth);\n    let y = Math.round(top / this.griddingWidth);\n    return { x, y };\n  }",
+              "default": "(left: number, top: number): GridPosition => {\r\n    let x = Math.round(left / this.griddingWidth);\r\n    let y = Math.round(top / this.griddingWidth);\r\n    return { x, y };\r\n  }",
               "description": "转换成的GidPosition",
               "parameters": [
                 {
@@ -465,7 +473,7 @@
             {
               "kind": "field",
               "name": "getBackLayout",
-              "default": "() => {\n    this.dataStoreIndex--;\n    return this.dataStore[this.dataStoreIndex]\n  }",
+              "default": "() => {\r\n    this.dataStoreIndex--;\r\n    return this.dataStore[this.dataStoreIndex]\r\n  }",
               "description": "返回 上次的layout",
               "return": {
                 "type": {
@@ -476,35 +484,35 @@
             {
               "kind": "field",
               "name": "backLayout",
-              "default": "() => {\n    const data = this.getBackLayout();\n    if (data) {\n      this.layoutData = JSON.parse(data);\n    }\n  }",
+              "default": "() => {\r\n    const data = this.getBackLayout();\r\n    if (data) {\r\n      this.layoutData = JSON.parse(data);\r\n    }\r\n  }",
               "description": "打开上次的保存layout"
             },
             {
               "kind": "field",
               "name": "getForwardLayout",
-              "default": "() => {\n    this.dataStoreIndex = this.dataStore.length - 1 > this.dataStoreIndex ? this.dataStoreIndex + 1 : this.dataStore.length - 1;\n    return this.dataStore[this.dataStoreIndex]\n  }",
+              "default": "() => {\r\n    this.dataStoreIndex = this.dataStore.length - 1 > this.dataStoreIndex ? this.dataStoreIndex + 1 : this.dataStore.length - 1;\r\n    return this.dataStore[this.dataStoreIndex]\r\n  }",
               "description": "下一个layout"
             },
             {
               "kind": "field",
               "name": "forwardLayout",
-              "default": "() => {\n    const data = this.getForwardLayout();\n    if (data) {\n      this.layoutData = JSON.parse(data);\n    }\n  }",
+              "default": "() => {\r\n    const data = this.getForwardLayout();\r\n    if (data) {\r\n      this.layoutData = JSON.parse(data);\r\n    }\r\n  }",
               "description": "打开下一步的layout"
             },
             {
               "kind": "field",
               "name": "close",
-              "default": "() => {\n    const emit: any = new Event('close');\n    emit.detail = this.layoutData;\n    this.dispatchEvent(emit);\n  }"
+              "default": "() => {\r\n    const emit: any = new Event('close');\r\n    emit.detail = this.layoutData;\r\n    this.dispatchEvent(emit);\r\n  }"
             },
             {
               "kind": "field",
               "name": "save",
-              "default": "() => {\n    const emit: any = new Event('save');\n    emit.detail = this.layoutData;\n    this.dispatchEvent(emit);\n  }"
+              "default": "() => {\r\n    const emit: any = new Event('save');\r\n    emit.detail = this.layoutData;\r\n    this.dispatchEvent(emit);\r\n  }"
             },
             {
               "kind": "field",
               "name": "gridItemFloat",
-              "default": "(event: PointerEvent) => {\n    const gridItem: GridItemData = this.getGridItem(event?.currentTarget);\n    if (gridItem) {\n      gridItem.float = !gridItem.float;\n      let z = 0;\n      this.layoutData.filter(item => item.float).forEach(item => { z = z < item.z ? item.z : z});\n      if(gridItem.float){\n        \n        gridItem.z = z + 1;\n      }else {\n        gridItem.z = 0;\n      }\n    }\n    this.reRender();\n  }"
+              "default": "(event: PointerEvent) => {\r\n    const gridItem: GridItemData = this.getGridItem(event?.currentTarget);\r\n    if (gridItem) {\r\n      gridItem.float = !gridItem.float;\r\n      let z = 0;\r\n      this.layoutData.filter(item => item.float).forEach(item => { z = z < item.z ? item.z : z});\r\n      if(gridItem.float){\r\n        \r\n        gridItem.z = z + 1;\r\n      }else {\r\n        gridItem.z = 0;\r\n      }\r\n    }\r\n    this.reRender();\r\n  }"
             },
             {
               "kind": "method",
@@ -634,15 +642,11 @@
             },
             {
               "kind": "method",
-              "name": "renderStyleSet"
-            },
-            {
-              "kind": "method",
-              "name": "renderToobar"
-            },
-            {
-              "kind": "method",
               "name": "openSetStyle"
+            },
+            {
+              "kind": "method",
+              "name": "openConfigSet"
             },
             {
               "kind": "field",
@@ -672,6 +676,14 @@
               "type": {
                 "text": "number"
               }
+            },
+            {
+              "kind": "method",
+              "name": "renderStyleSet"
+            },
+            {
+              "kind": "method",
+              "name": "renderToobar"
             }
           ],
           "superclass": {

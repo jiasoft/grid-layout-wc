@@ -45,6 +45,7 @@ export declare class GridLayoutWc extends LitElement {
     gridMargin: number;
     edit: boolean;
     layoutData: GridItemData[];
+    hideToolbar: boolean;
     oldLayoutData: string;
     styleMapEditing: boolean;
     dragData: {
@@ -177,6 +178,7 @@ export declare class GridLayoutWc extends LitElement {
     setZindexUp(): void;
     setZindexDown(): void;
     openSetStyle(): void;
+    openConfigSet(): void;
     get curActiveGridItem(): any;
     get curActiveGridItemStyle(): any;
     get curSelectGridItem(): GridItemData | undefined;
