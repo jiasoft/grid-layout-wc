@@ -1050,8 +1050,7 @@ GridLayoutWc.styles = css `
   .grid-item.move {
     cursor:move;
   }
-  .grid-item[selected="true"] {
-    
+  .grid-item[edit="true"][selected="true"] {
     outline:2px solid #a2c1d6;
   }
   .grid-item[float="true"] {

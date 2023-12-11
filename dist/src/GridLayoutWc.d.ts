@@ -186,8 +186,8 @@ export declare class GridLayoutWc extends LitElement {
     get stageHeight(): number;
     connectedCallback(): void;
     render(): import("lit-html").TemplateResult<1>;
-    renderStyleSet(): import("lit-html").TemplateResult<1> | "";
-    renderToobar(): import("lit-html").TemplateResult<1> | "";
+    renderStyleSet(): "" | import("lit-html").TemplateResult<1>;
+    renderToobar(): "" | import("lit-html").TemplateResult<1>;
     static styles: import("lit").CSSResult;
 }
 export {};
