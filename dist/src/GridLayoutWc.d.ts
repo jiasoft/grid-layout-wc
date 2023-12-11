@@ -45,6 +45,7 @@ export declare class GridLayoutWc extends LitElement {
     gridMargin: number;
     edit: boolean;
     layoutData: GridItemData[];
+    hideToolbar: boolean;
     oldLayoutData: string;
     styleMapEditing: boolean;
     dragData: {
@@ -177,6 +178,7 @@ export declare class GridLayoutWc extends LitElement {
     setZindexUp(): void;
     setZindexDown(): void;
     openSetStyle(): void;
+    openConfigSet(): void;
     get curActiveGridItem(): any;
     get curActiveGridItemStyle(): any;
     get curSelectGridItem(): GridItemData | undefined;
@@ -184,8 +186,8 @@ export declare class GridLayoutWc extends LitElement {
     get stageHeight(): number;
     connectedCallback(): void;
     render(): import("lit-html").TemplateResult<1>;
-    renderStyleSet(): "" | import("lit-html").TemplateResult<1>;
-    renderToobar(): "" | import("lit-html").TemplateResult<1>;
+    renderStyleSet(): import("lit-html").TemplateResult<1> | "";
+    renderToobar(): import("lit-html").TemplateResult<1> | "";
     static styles: import("lit").CSSResult;
 }
 export {};
