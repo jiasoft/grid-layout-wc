@@ -1,1 +1,1 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../../src/index.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAE,MAAM,mBAAmB,CAAC;AACjD,gDAAgD","sourcesContent":["export { GridLayoutWc } from './GridLayoutWc.js';\r\n// export { GridItemWc } from './GridItemWc.js';"]}
+{"version":3,"file":"index.js","sourceRoot":"","sources":["../../src/index.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAE,MAAM,mBAAmB,CAAC;AACjD,gDAAgD","sourcesContent":["export { GridLayoutWc } from './GridLayoutWc.js';\n// export { GridItemWc } from './GridItemWc.js';"]}

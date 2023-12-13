@@ -36,15 +36,6 @@
             },
             {
               "kind": "field",
-              "name": "stylemap",
-              "type": {
-                "text": "CSSType"
-              },
-              "static": true,
-              "default": "{ borderWidth:'1', borderColor:'', borderStyle:'', backgroundColor:'' }"
-            },
-            {
-              "kind": "field",
               "name": "griddingWidth",
               "type": {
                 "text": "number"
@@ -85,6 +76,30 @@
             },
             {
               "kind": "field",
+              "name": "curGridItemSubMenuPos",
+              "type": {
+                "text": "GridPosition"
+              },
+              "default": "{x:0,y:0}"
+            },
+            {
+              "kind": "field",
+              "name": "curGridItemSubMenuShow",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "curGridItemSubMenuGridData",
+              "type": {
+                "text": "GridItemData|null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
               "name": "oldLayoutData",
               "type": {
                 "text": "string"
@@ -94,6 +109,14 @@
             {
               "kind": "field",
               "name": "styleMapEditing",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "showDialogGridStyle",
               "type": {
                 "text": "boolean"
               },
@@ -389,6 +412,15 @@
             },
             {
               "kind": "method",
+              "name": "closeGridItemSubMenu"
+            },
+            {
+              "kind": "method",
+              "name": "gridItemCloseBySubMenu",
+              "description": "移除GridItem"
+            },
+            {
+              "kind": "method",
               "name": "getGridItemIndex",
               "parameters": [
                 {
@@ -515,6 +547,11 @@
               "default": "(event: PointerEvent) => {\r\n    const gridItem: GridItemData = this.getGridItem(event?.currentTarget);\r\n    if (gridItem) {\r\n      gridItem.float = !gridItem.float;\r\n      let z = 0;\r\n      this.layoutData.filter(item => item.float).forEach(item => { z = z < item.z ? item.z : z});\r\n      if(gridItem.float){\r\n        \r\n        gridItem.z = z + 1;\r\n      }else {\r\n        gridItem.z = 0;\r\n      }\r\n    }\r\n    this.reRender();\r\n  }"
             },
             {
+              "kind": "field",
+              "name": "gridItemFloatBySubMenu",
+              "default": "() => {\r\n    const gridItem: GridItemData|null = this.curGridItemSubMenuGridData;\r\n    if (gridItem) {\r\n      gridItem.float = !gridItem.float;\r\n      let z = 0;\r\n      this.layoutData.filter(item => item.float).forEach(item => { z = z < item.z ? item.z : z});\r\n      if(gridItem.float){\r\n        \r\n        gridItem.z = z + 1;\r\n      }else {\r\n        gridItem.z = 0;\r\n      }\r\n      \r\n      this.closeGridItemSubMenu();\r\n      this.reRender();\r\n    }\r\n    \r\n  }"
+            },
+            {
               "kind": "method",
               "name": "onGridLayoutClick",
               "parameters": [
@@ -570,7 +607,7 @@
             },
             {
               "kind": "method",
-              "name": "changeInput",
+              "name": "dialogChangeInput",
               "parameters": [
                 {
                   "name": "attr",
@@ -646,7 +683,11 @@
             },
             {
               "kind": "method",
-              "name": "openConfigSet"
+              "name": "openSetStyleBySubMenu"
+            },
+            {
+              "kind": "method",
+              "name": "openConfigSetBySubMenu"
             },
             {
               "kind": "field",
@@ -665,7 +706,7 @@
             },
             {
               "kind": "field",
-              "name": "curSelectGridItemUserStyle",
+              "name": "curGridItemSubMenuGridDataUserStyle",
               "type": {
                 "text": "CSSType | undefined"
               }
@@ -679,11 +720,19 @@
             },
             {
               "kind": "method",
-              "name": "renderStyleSet"
+              "name": "dialogClose"
             },
             {
               "kind": "method",
               "name": "renderToobar"
+            },
+            {
+              "kind": "method",
+              "name": "showGridItemMenu"
+            },
+            {
+              "kind": "method",
+              "name": "showDialog"
             }
           ],
           "superclass": {

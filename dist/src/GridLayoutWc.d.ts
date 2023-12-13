@@ -40,14 +40,17 @@ type GridPosition = {
 };
 export declare class GridLayoutWc extends LitElement {
     RenderIndex: number;
-    static stylemap: CSSType;
     griddingWidth: number;
     gridMargin: number;
     edit: boolean;
     layoutData: GridItemData[];
     hideToolbar: boolean;
+    curGridItemSubMenuPos: GridPosition;
+    curGridItemSubMenuShow: boolean;
+    curGridItemSubMenuGridData: GridItemData | null;
     oldLayoutData: string;
     styleMapEditing: boolean;
+    showDialogGridStyle: boolean;
     dragData: {
         x: number;
         y: number;
@@ -74,7 +77,7 @@ export declare class GridLayoutWc extends LitElement {
     drawDragDataHtml(): import("lit-html").TemplateResult<1>;
     constructor();
     findGridItemData: (id: any) => GridItemData | undefined;
-    addGridItem(): void;
+    addGridItem(): GridItemData;
     /**
      * 获取空间的位置
      * @param w
@@ -124,6 +127,9 @@ export declare class GridLayoutWc extends LitElement {
     animateGridItem(item: GridItemData, w?: number, h?: number): Promise<unknown>;
     /** 移除GridItem */
     gridItemClose(event: PointerEvent): Promise<void>;
+    closeGridItemSubMenu(): void;
+    /** 移除GridItem */
+    gridItemCloseBySubMenu(): Promise<void>;
     getGridItemIndex(target: any): number;
     getGridItem(target: any): GridItemData;
     /**
@@ -164,13 +170,14 @@ export declare class GridLayoutWc extends LitElement {
     close: () => void;
     save: () => void;
     gridItemFloat: (event: PointerEvent) => void;
+    gridItemFloatBySubMenu: () => void;
     onGridLayoutClick(event: any): void;
     getGridItemTopY(dataList: GridItemData[], grid: ItemData, exceptIds: any[]): {
         x: number;
         y: number;
     };
     calcOverArea(data1: ItemData, data2: ItemData): number;
-    changeInput(attr: "borderStyle" | "borderColor" | "borderWidth" | "backgroundColor" | "borderRadius", e: any): void;
+    dialogChangeInput(attr: "borderStyle" | "borderColor" | "borderWidth" | "backgroundColor" | "borderRadius", e: any): void;
     sortTopSpace(list: GridItemData[]): void;
     sortBottomOver(list: GridItemData[]): void;
     pressDownOver(list: GridItemData[], item: GridItemData): void;
@@ -178,16 +185,19 @@ export declare class GridLayoutWc extends LitElement {
     setZindexUp(): void;
     setZindexDown(): void;
     openSetStyle(): void;
-    openConfigSet(): void;
+    openSetStyleBySubMenu(): void;
+    openConfigSetBySubMenu(): void;
     get curActiveGridItem(): any;
     get curActiveGridItemStyle(): any;
     get curSelectGridItem(): GridItemData | undefined;
-    get curSelectGridItemUserStyle(): CSSType | undefined;
+    get curGridItemSubMenuGridDataUserStyle(): CSSType | undefined;
     get stageHeight(): number;
+    dialogClose(): void;
     connectedCallback(): void;
     render(): import("lit-html").TemplateResult<1>;
-    renderStyleSet(): "" | import("lit-html").TemplateResult<1>;
     renderToobar(): "" | import("lit-html").TemplateResult<1>;
+    showGridItemMenu(): import("lit-html").TemplateResult<1>;
+    showDialog(): "" | import("lit-html").TemplateResult<1>;
     static styles: import("lit").CSSResult;
 }
 export {};
